@@ -9,7 +9,7 @@
   * Css
 * Back
   * Deno
-  * MySql
+  * MySQL
   * Type Scrip
 
 ___
