@@ -1,0 +1,126 @@
+.clean-login {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    background-color: #f4f4f4;
+    font-family: sans-serif;
+  }
+  
+  .clean-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .clean-header h1 {
+    color: #333;
+  }
+  
+  .clean-login-card {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    width: 350px;
+  }
+  
+  .clean-login-card h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    color: #333;
+  }
+  
+  .clean-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .clean-input-group {
+    margin-bottom: 15px;
+  }
+  
+  .clean-input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+  }
+  
+  .clean-input-group input {
+    width: calc(100% - 22px);
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .clean-password-help {
+    display: block;
+    margin-top: 5px;
+    text-align: right;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 14px;
+  }
+  
+  .clean-login-btn {
+    padding: 10px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+  }
+  
+  .clean-login-btn:hover {
+    background-color: #0056b3;
+  }
+  
+  .clean-divider {
+    text-align: center;
+    margin: 20px 0;
+    color: #666;
+  }
+  
+  .clean-register-link {
+    display: block;
+    text-align: center;
+    margin-bottom: 20px;
+    color: #007bff;
+    text-decoration: none;
+    font-size: 16px;
+  }
+  
+  .clean-social-login {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .clean-social-btn {
+    padding: 10px;
+    margin-bottom: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .clean-social-btn.apple {
+    background-color: #000;
+    color: #fff;
+  }
+  
+  .clean-social-btn.facebook {
+    background-color: #1877f2;
+    color: #fff;
+  }
+  
+  .clean-footer {
+    text-align: center;
+    margin-top: 30px;
+    color: #666;
+    font-size: 14px;
+  }
