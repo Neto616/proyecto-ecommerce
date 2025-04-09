@@ -215,6 +215,14 @@
   "workspace": {
     "dependencies": [
       "jsr:@hono/hono@^4.7.2"
-    ]
+    ],
+    "packageJson": {
+      "dependencies": [
+        "npm:react-dom@19",
+        "npm:react-router-dom@^7.4.1",
+        "npm:react-scripts@5.0.1",
+        "npm:react@19"
+      ]
+    }
   }
 }

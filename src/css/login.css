@@ -1,0 +1,125 @@
+/* Estilos generales */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 20px;
+  max-width: 500px;
+  margin: 0 auto;
+  font-family: Arial, sans-serif;
+  position: relative;
+}
+
+/* Estilos del logo */
+.logo-placeholder {
+  margin: 40px 0;
+  text-align: center;
+}
+
+.logo-empty-space {
+  width: 150px;
+  height: 150px;
+  margin: 0 auto;
+  background-color: #f0f0f0;
+  border-radius: 8px;
+}
+
+/* Contenido principal */
+.login-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+h2 {
+  font-size: 24px;
+  text-align: center;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.subtitle {
+  text-align: center;
+  color: #666;
+  margin-bottom: 30px;
+}
+
+.input-group {
+  margin-bottom: 25px;
+}
+
+.input-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #333;
+}
+
+.choncho-input {
+  width: 100%;
+  padding: 15px;
+  font-size: 16px;
+  border: 2px solid #ddd;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.choncho-input:focus {
+  border-color: #004f9f;
+  outline: none;
+}
+
+.continue-button {
+  width: 100%;
+  padding: 15px;
+  background-color: #004f9f;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.continue-button:hover {
+  background-color: #003366;
+}
+
+/* Footer actualizado */
+/* Footer con elementos a los extremos */
+.login-footer {
+  width: 100%;
+  padding: 20px 0;
+  margin-top: 40px;
+}
+
+.footer-content {
+  display: flex;
+  justify-content: space-between; /* Separa los elementos a los extremos */
+  align-items: center; /* Alinea verticalmente al centro */
+  width: 100%;
+}
+
+.copyright {
+  color: #666;
+  font-size: 14px;
+  margin: 0; /* Elimina márgenes por defecto */
+}
+
+.legal-links {
+  display: flex;
+  gap: 20px; /* Espacio entre los enlaces */
+}
+
+.legal-links a {
+  color: #004f9f;
+  text-decoration: none;
+  font-size: 14px;
+  white-space: nowrap; /* Evita que los textos se dividan en varias líneas */
+}
+
+.legal-links a:hover {
+  text-decoration: underline;
+}
