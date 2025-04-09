@@ -1,5 +1,6 @@
 import { Context } from "hono";
-import {default as db} from "../db/connection.ts";
+import { getCookie, getSignedCookie, setCookie, setSignedCookie,deleteCookie } from 'hono/cookie';
+
 import { vistas_productos, vistas_usuarios } from "../types/tipos_rutas.ts";
 import { Productos } from "../db/consultas.ts";
 
@@ -7,9 +8,21 @@ const usuarios:vistas_usuarios= {
     inicio: async (c: Context) => {
         return c.json({ estatus: 1 , 
             result: { 
-                info: "Bienvenido", data: []
+                info: "Bienvenido", data: {}
             }})
     },
+    iniciar_sesion: async (c: Context) => {
+        try {
+            return c.json({ estatus: 1, 
+                result: {
+                    info: "Iniciar sesión", data: []
+                }
+            })
+        } catch (error) {
+            console.log(error);
+            return c.redirect("/");
+        }
+    }
 
 }
 
@@ -20,7 +33,7 @@ const productos:vistas_productos= {
 
             return c.json({ estatus: 1, 
                 result: {
-                    info: "Todos los productos", data: [productos]
+                    info: "Todos los productos", data: { productos }
                 }})
         } catch (error) {
             return c.json({ estatus: 0, result: {
@@ -31,11 +44,11 @@ const productos:vistas_productos= {
     },
     detalle: async (c: Context) => {
         try {
-            let producto = c.req.param("producto");
+            const producto = c.req.param("producto");
             const detalles = await Productos.detalle(producto);
             return c.json({ estatus: 1, 
                 result: {
-                    info: "Detalle del producto", producto: c.req.param("producto"), data: [detalles]
+                    info: "Detalle del producto", data: {producto: producto, detalles}
                 }})
         } catch (error) {
             return c.json({ estatus: 0, result: {

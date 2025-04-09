@@ -1,4 +1,5 @@
 import { Client } from "https://deno.land/x/mysql/mod.ts";
+import mysql from "npm:mysql2@^2.3.3/promise";
 
 
 const connection: Client=  new Client()
@@ -13,6 +14,19 @@ abstract class Consultas {
 
     public async initDB():Promise<void>{
         try {
+            // await mysql.createPool({
+            //     host: "localhost",
+            //     user: "root",
+            //     database: "ecommerce",
+            //     password: "Neto_616",
+            //     waitForConnections: true,
+            //     connectionLimit: 10,
+            //     maxIdle: 10, // max idle connections, the default value is the same as `connectionLimit`
+            //     idleTimeout: 60000, // idle connections timeout, in milliseconds, the default value 60000
+            //     queueLimit: 0,
+            //     enableKeepAlive: true,
+            //     keepAliveInitialDelay: 0,
+            // });
             await connection.connect({
                 hostname: "localhost",
                 username: "root",
@@ -27,16 +41,6 @@ abstract class Consultas {
         }
     }
 
-    // private async getUsuarios(): Promise<any>{
-    //     try {
-    //         const dataTable = await this.db.execute("select * from usuarios");
-    //         console.log(dataTable);
-    //         return dataTable.rows;
-    //     } catch (error) {
-    //         console.log(error);
-    //         return [];
-    //     }
-    // }
 }
 
 
