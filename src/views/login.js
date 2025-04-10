@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import '../css/login.css';
 
 const Login = () => {
-  const [email, setEmail] = useState('rubenalberto859@gmail.com');
+  const [email, setEmail] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -26,7 +26,7 @@ const Login = () => {
             <input
               id="email"
               type="email"
-              value={email}
+              placeholder="ejemplo@gmail.com"
               onChange={(e) => setEmail(e.target.value)}
               className="choncho-input"
             />

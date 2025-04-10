@@ -1,4 +1,3 @@
-import { ResponseTimeoutError } from "https://deno.land/x/mysql@v2.12.1/src/constant/errors.ts";
 import Consultas from "./connection.ts";
 
 class Usuarios extends Consultas{

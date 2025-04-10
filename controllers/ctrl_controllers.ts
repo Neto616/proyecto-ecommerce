@@ -1,14 +1,7 @@
 import { Context } from "hono";
-import {
-    getCookie,
-    getSignedCookie,
-    setCookie,
-    setSignedCookie,
-    deleteCookie,
-  } from 'hono/cookie'
+import { getCookie, setCookie} from 'hono/cookie'
 import { controladores_usuario } from "../types/tipos_rutas.ts";
 import {Usuarios} from '../db/consultas.ts';
-import path from "node:path";
 
 const usuarios_abc: controladores_usuario = {
     crear: async (c: Context) => {

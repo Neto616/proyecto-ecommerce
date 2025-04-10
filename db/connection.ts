@@ -1,5 +1,5 @@
 import { Client } from "https://deno.land/x/mysql/mod.ts";
-import mysql from "npm:mysql2@^2.3.3/promise";
+// import mysql from "npm:mysql2@^2.3.3/promise";
 
 
 const connection: Client=  new Client()
