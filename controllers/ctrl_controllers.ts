@@ -1,6 +1,14 @@
 import { Context } from "hono";
+import {
+    getCookie,
+    getSignedCookie,
+    setCookie,
+    setSignedCookie,
+    deleteCookie,
+  } from 'hono/cookie'
 import { controladores_usuario } from "../types/tipos_rutas.ts";
 import {Usuarios} from '../db/consultas.ts';
+import path from "node:path";
 
 const usuarios_abc: controladores_usuario = {
     crear: async (c: Context) => {
@@ -56,6 +64,29 @@ Confirmar Contraseña: ${confirmacion}
             return c.json({ estatus: 1, result: {info: "Eliminar usuario"}})
         } catch (error) {
             return c.json({ estatus: 0, result: {info: "Hubo un error", error: error}})
+        }
+    },
+    iniciar_sesion: async (c: Context) => {
+        try {
+            const {correo, contrasena} = await c.req.parseBody();
+            const { result } = (await Usuarios.iniciarSesion(correo?.toString() || "", contrasena?.toString() || "")).result;
+            if(!result.length) return c.json({
+                estatus: 2, 
+                result: { 
+                    info: "No existe un usuario con esas credenciales.", 
+            }});
+            const usuario_nombre: string = (result[0].nombre+" "+result[0].apellidos);
+            setCookie(c, 'usuario_cookie', JSON.stringify({id: result[0].id, nombre: usuario_nombre}), {path: "/"});
+            console.log(`Cookie del usuario: ${getCookie(c, 'usuario_cookie')}`);
+            return c.json({
+                estatus: 1, 
+                result: { 
+                    info: "Iniciar sesión", 
+                    nombre: usuario_nombre
+                }});
+        } catch (error) {
+            console.log(error);
+            return c.redirect("/");
         }
     }
 }

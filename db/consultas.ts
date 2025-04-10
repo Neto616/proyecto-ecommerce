@@ -1,4 +1,4 @@
-import { productos } from "../controllers/ctrl_views.ts";
+import { ResponseTimeoutError } from "https://deno.land/x/mysql@v2.12.1/src/constant/errors.ts";
 import Consultas from "./connection.ts";
 
 class Usuarios extends Consultas{
@@ -37,11 +37,42 @@ class Usuarios extends Consultas{
                 [id, this.nombre, this.contrasena, this.apellidos, this.whatsapp]
             )
 
-            return {estatus: 1, result: rows}
+            return {
+                estatus: 1, 
+                result: rows
+            }
 
         } catch (error) {
             console.log(error);
             return {estatus:0, result: {info: error}}
+        }
+    }
+
+    public static async iniciarSesion(correo: string, contrasena: string) {
+        try {
+            const conectar = new Usuarios();
+            if(!conectar.db) await conectar.initDB();
+
+            const {rows} = await conectar.db.execute(
+                "select * from usuarios where correo like ? and contrasena like ?",
+                [correo, contrasena]
+            )
+
+            return {
+                estatus: 1,
+                result: {
+                    result: rows || [],
+                }
+            }
+        } catch (error) {
+            console.log(error);
+            return {
+                estatus: 0, 
+                result: {
+                    info: error,
+                    result: []
+                }
+            }
         }
     }
 
@@ -97,4 +128,7 @@ class Productos extends Consultas{
     }
 }
 
-export { Usuarios, Productos };
+export { 
+    Usuarios, 
+    Productos 
+};
