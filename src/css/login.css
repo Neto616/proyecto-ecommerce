@@ -73,7 +73,7 @@ h2 {
 .continue-button {
   width: 100%;
   padding: 15px;
-  background-color: #004f9f;
+  background: linear-gradient(135deg, #a67c52, #c6a27e);
   color: white;
   border: none;
   border-radius: 8px;
@@ -84,11 +84,10 @@ h2 {
 }
 
 .continue-button:hover {
-  background-color: #003366;
+  background: linear-gradient(135deg, #c6a27e, #a67c52);
 }
 
 /* Footer actualizado */
-/* Footer con elementos a los extremos */
 .login-footer {
   width: 100%;
   padding: 20px 0;

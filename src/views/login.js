@@ -41,7 +41,7 @@ const Login = () => {
       {/* Footer con elementos a los extremos */}
       <footer className="login-footer">
         <div className="footer-content">
-          <span className="copyright">© 2025 Sam's Club. Todos los derechos reservados.</span>
+          <span className="copyright">© 2025 E-Commerce. Todos los derechos reservados.</span>
           <div className="legal-links">
             <a href="#">Términos y condiciones</a>
             <a href="#">Aviso de Privacidad</a>

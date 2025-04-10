@@ -1,0 +1,109 @@
+.topbar-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background-color: white;
+    padding: 16px 32px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    border-radius: 12px;
+    margin: 20px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  }
+  
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+  }
+  
+  .topbar-logo {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .topbar-logo-img {
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    margin-right: 8px;
+  }
+  
+  .topbar-categorias-btn {
+    margin-left: 32px;
+    margin-right: 24px;
+    padding: 10px 20px;
+    background: linear-gradient(135deg, #a67c52, #c6a27e);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 15px;
+    font-weight: 500;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+    transition: all 0.3s ease;
+  }
+  
+  .topbar-categorias-btn:hover {
+    background: linear-gradient(135deg, #c6a27e, #a67c52);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 16px rgba(249, 115, 22, 0.3);
+  }
+  
+  .topbar-search {
+    position: relative;
+    max-width: 460px;
+    flex: 1;
+  }
+  
+  .topbar-search-button {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0;
+    color: #a67c52;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  
+  .topbar-search-input {
+    width: 420px;
+    padding: 12px 20px;
+    background-color: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 15px;
+    color: #c6a27e;
+    transition: all 0.3s ease;
+    box-shadow: inset 0 1px 3px #c6a27ec5;
+  }
+  
+  .topbar-search-input:focus {
+    background-color: #fff;
+    border-color: #a67c52;
+    box-shadow: 0 0 0 3px #c6a27e;
+    outline: none;
+  }
+  
+  .topbar-icons {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+  }
+  
+  .topbar-icon {
+    font-size: 32px;
+    color: #111827;
+    cursor: pointer;
+    transition: color 0.2s ease;
+  }
+  
+  .topbar-icon:hover {
+    color: #a67c52;
+  }
+  
