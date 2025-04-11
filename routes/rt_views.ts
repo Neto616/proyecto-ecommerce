@@ -5,6 +5,7 @@ import { usuarios, productos }from '../controllers/ctrl_views.ts';
 const route: Hono = new Hono()
 
 route.get("/", usuarios.inicio);
+route.get("/user_exist", usuarios.existe);
 route.get("/productos", productos.todos);
 route.get("/detalle/:producto", productos.detalle);
 route.get("/cerrar-sesion", (c: Context): Response => {

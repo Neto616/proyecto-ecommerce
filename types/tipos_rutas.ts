@@ -2,6 +2,7 @@ import { Context } from 'hono';
 
 export type vistas_usuarios = {
     inicio: (c:Context) => Promise<Response>,
+    existe: (c:Context) => Promise<Response>,
     iniciar_sesion: (c:Context) => Promise<Response>
 };
 

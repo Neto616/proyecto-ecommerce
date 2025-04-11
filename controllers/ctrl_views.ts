@@ -1,6 +1,6 @@
 import { Context } from "hono";
 import { getCookie, getSignedCookie, setCookie, setSignedCookie,deleteCookie } from 'hono/cookie';
-
+import { Usuarios } from "../db/consultas.ts";
 import { vistas_productos, vistas_usuarios } from "../types/tipos_rutas.ts";
 import { Productos } from "../db/consultas.ts";
 
@@ -10,6 +10,19 @@ const usuarios:vistas_usuarios= {
             result: { 
                 info: "Bienvenido", data: {}
             }})
+    },
+    existe: async (c:Context) => {
+      try {
+        const correo = c.req.header("correo");
+        const { estatus, result } = (await Usuarios.isExist(correo?.toString() || ""));
+
+        if(estatus == 0) return c.redirect("/"); //Ocurrio un error asi que se llevara al inicio
+        if(estatus == 2) return c.json({ estatus: 2 }) //Estaria dando datos para crear cuenta
+        return c.json({ estatus: 1 }) //Estaria dando a iniciar sesion
+      } catch (error) {
+        console.log(error);
+        return c.redirect("/");
+      }  
     },
     iniciar_sesion: async (c: Context) => {
         try {

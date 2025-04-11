@@ -1,3 +1,4 @@
+import { resolveCallback } from "hono/utils/html";
 import Consultas from "./connection.ts";
 
 class Usuarios extends Consultas{
@@ -44,6 +45,30 @@ class Usuarios extends Consultas{
         } catch (error) {
             console.log(error);
             return {estatus:0, result: {info: error}}
+        }
+    }
+
+    public static async isExist(correo: string){
+        try {
+            if(!correo) return { estatus: 2, result: [], info: "No hay correo"};
+            const conectar = new Usuarios();
+            if(!conectar.db) await conectar.initDB();
+
+            const {rows} = await conectar.db.execute(
+                `SELECT * FROM usuarios where correo like ?;`,
+                [correo]
+            )
+
+            return {
+                estatus: 1, 
+                result: rows
+            };
+        } catch (error) {
+            console.log(error);
+            return {
+                estatus: 0,
+                result: []
+            };
         }
     }
 
