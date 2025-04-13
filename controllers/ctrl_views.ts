@@ -1,17 +1,23 @@
+// Importamos el modulo necesario de la paqueteria hono
 import { Context } from "hono";
+// Importamos los modulos que generamos dentro del proyecto
 import { Usuarios } from "../db/consultas.ts";
 import { vistas_productos, vistas_usuarios } from "../types/tipos_rutas.ts";
 import { Productos } from "../db/consultas.ts";
 
+//Generamos un objeto JSON que dentro tendrán funciones anonimas y estas son las acciones que se realizarán con los usuarios
 const usuarios:vistas_usuarios= {
+    //Tendremos una funcion de inicio
     inicio: async (c: Context) => {
         return c.json({ estatus: 1 , 
             result: { 
                 info: "Bienvenido", data: {}
             }})
     },
+    //La función se llama existe que llama a nueustro objeto usuario y verifica que el usuari exista en base a su correo
     existe: async (c:Context) => {
       try {
+        //El correo vendrá en el header de nuestra llamada a la petición 
         const correo = c.req.header("correo");
         const { estatus, result } = (await Usuarios.isExist(correo?.toString() || ""));
 
@@ -39,6 +45,7 @@ const usuarios:vistas_usuarios= {
 }
 
 const productos:vistas_productos= {
+    //Llama y carga la vista de todos los productos que se tengan en al base de datos
     todos: async (c: Context) => {
         try {
             const productos = await Productos.mostrarTodos();
@@ -54,6 +61,7 @@ const productos:vistas_productos= {
             }})
         }
     },
+    //Trae los datos del producto a buscar
     detalle: async (c: Context) => {
         try {
             const producto = c.req.param("producto");
@@ -70,5 +78,5 @@ const productos:vistas_productos= {
         }
     }
 }
-
+//Exportamos nuestros dos objetos que se usaran en las rutas
 export {usuarios, productos}
