@@ -1,3 +1,4 @@
+import { data } from "react-router-dom";
 import Consultas from "./connection.ts";
 
 class Usuarios extends Consultas{
@@ -146,7 +147,7 @@ class Productos extends Consultas{
             return {estatus: 1, result: {info: "Listado de productos", data: rows}};
         } catch (error) {
             console.log(error);
-            return {estatus: 0, result: {info: error}};
+            return {estatus: 0, result: {info: error, data: []}};
         }
     }
 
@@ -173,6 +174,37 @@ class Carrito extends Consultas {
         super();
     }
 
+    
+    public getUsuarioId() : number {
+        return this.usuarioId;
+    }
+    
+    public async carrito(){
+        try {
+            if(!this.db) await this.initDB();
+
+            const { rows } = await this.db.execute(`select * from vista_carrito where id_usuario = ?;`, [this.getUsuarioId()]);
+
+            console.log(rows)
+            return {
+                estatus: 1,
+                info: {
+                    message: "Listado de todos los productos dentro del carrito: ",
+                    data: []
+                }
+            }
+        } catch (error) {
+            console.log(error);
+            return {
+                estatus: 0,
+                info: {
+                    message: "Ha ocurrido un error: "+error,
+                    data: []
+                }
+            };
+        }
+    }
+
     public async addToCart(producto: number, cantidad: number) { 
         try {
             if(!this.db) await this.initDB();
@@ -185,7 +217,7 @@ class Carrito extends Consultas {
 
             await this.db.execute(
                 `call guardar_carrito(?,?,?, @estatus, @mensaje)`,
-                [this.usuarioId, producto, cantidad]
+                [this.getUsuarioId(), producto, cantidad]
             )
 
             const [output] = await this.db.query(`select @estatus as estatus, @mensaje as mensaje`);
@@ -204,6 +236,64 @@ class Carrito extends Consultas {
             return {
                 estatus: 0,
                 result: {
+                    message: "Ha ocurrido un error: "+error
+                }
+            };
+        }
+    }
+
+    public async updateCart(producto: number, action: string){
+        try {
+            console.log(producto, action);
+            if(!this.db) await this.initDB();
+            await this.db.query(
+                `call actualizar_carrito(?, ?, ?, @estatus, @mensaje)`,
+                [this.getUsuarioId(), producto, action]);
+
+            const [output] = await this.db.query(`select @estatus as estatus, @mensaje as mensaje`);
+
+            if(output.estatus === 0) return { estatus: 2, info: { message: "Ha ocurrido un error favor de intentarlo nuevamente" } };
+            
+            return {
+                estatus: 1, 
+                info: {
+                    message: "Se ha actualizado el carrito"
+                }
+            };
+        } catch (error) {
+            console.log(error);
+            return {
+                estatus: 0,
+                info: {
+                    message: "Ha ocurrido un erorr: "+error
+                }
+            };
+        }
+    }
+
+    public async deleteCart(producto: number){
+        try {
+            if(!this.db) await this.initDB();
+
+            await this.db.execute(
+                `call eliminar_carrito(?, ?, @estatus, @mensaje)`
+                ,[this.getUsuarioId(), producto]);
+
+            const [output] = await this.db.query(`select @estatus as estatus, @mensaje as mensaje`);
+
+            if(output.estatus === 0) return { estatus: 2, info: { message: "Ha ocurrido nu error favor de intentarlo de nuevo" }};
+
+            return {
+                estatus: 1,
+                info: {
+                    message: "Se elimino el producto del carrito"
+                }
+            };
+        } catch (error) {
+            console.log(error);
+            return {
+                estatus: 0,
+                info: {
                     message: "Ha ocurrido un error: "+error
                 }
             };
