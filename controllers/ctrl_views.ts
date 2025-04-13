@@ -1,5 +1,4 @@
 import { Context } from "hono";
-import { getCookie, getSignedCookie, setCookie, setSignedCookie,deleteCookie } from 'hono/cookie';
 import { Usuarios } from "../db/consultas.ts";
 import { vistas_productos, vistas_usuarios } from "../types/tipos_rutas.ts";
 import { Productos } from "../db/consultas.ts";

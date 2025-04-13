@@ -1,4 +1,3 @@
-import { resolveCallback } from "hono/utils/html";
 import Consultas from "./connection.ts";
 
 class Usuarios extends Consultas{
@@ -116,8 +115,25 @@ class Usuarios extends Consultas{
 }
 
 class Productos extends Consultas{
-    constructor(){
+    constructor(private id?: number){
         super();
+    }
+
+    public async hasExistence(): Promise<number>{
+        try {
+            if (!this.db) await this.initDB();
+
+            const [rows] = await this.db.query(
+                `select existencia 
+                from productos
+                where id = ?`
+            ,[this.id]);
+
+            return rows?.existencia || 0; 
+        } catch (error) {
+            console.log(error);
+            return 0;
+        }
     }
 
     public static async mostrarTodos(){
@@ -152,7 +168,51 @@ class Productos extends Consultas{
     }
 }
 
+class Carrito extends Consultas {
+    constructor(private usuarioId: number){
+        super();
+    }
+
+    public async addToCart(producto: number, cantidad: number) { 
+        try {
+            if(!this.db) await this.initDB();
+
+            const productoConsulta: Productos = new Productos(producto);
+            const hasExistence: number = await productoConsulta.hasExistence();
+
+            if(!hasExistence) return {estatus: 2, result: {message: "El producto no tiene existencia"}};
+            if(hasExistence < cantidad) return {estatus: 3, result: {message: "La cantidad es mayor a la existencia que se tiene"}};
+
+            await this.db.execute(
+                `call guardar_carrito(?,?,?, @estatus, @mensaje)`,
+                [this.usuarioId, producto, cantidad]
+            )
+
+            const [output] = await this.db.query(`select @estatus as estatus, @mensaje as mensaje`);
+
+            console.log(output)
+            if(output.estatus === 2) return { estatus: 0, result: { message: "Ocurrio un error favor de intentarlo nuevamente mas tarde" }};
+            else
+                return {
+                    estatus: 1, 
+                    result: {
+                        message: "El producto se ha guardado de manera exitosa"
+                    }
+                };
+        } catch (error) {
+            console.log(error)
+            return {
+                estatus: 0,
+                result: {
+                    message: "Ha ocurrido un error: "+error
+                }
+            };
+        }
+    }
+}
+
 export { 
     Usuarios, 
-    Productos 
+    Productos,
+    Carrito
 };

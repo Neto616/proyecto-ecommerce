@@ -19,5 +19,6 @@ export type controladores_usuario = {
 };
 
 export type controladres_productos = {
-    favorito: (c: Context) => Promise<Response>
+    favorito: (c: Context) => Promise<Response>,
+    agregar_carrito: (c: Context) => Promise<Response>
 };
