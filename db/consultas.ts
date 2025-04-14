@@ -203,33 +203,37 @@ class Productos extends Consultas{
         }
     }
 }
-
+//Creamos una clase Carrito que hereda Consultas
 class Carrito extends Consultas {
+    //Creamos nuestro constructor con un atributo privado usuarioId para poder ingresar al carrito de nuestro usuario.
     constructor(private usuarioId: number){
         super();
     }
-
-    
-    public getUsuarioId() : number {
+    //Creamos un getter para obtener nuestro atributo privado (No es necesario pero se deja)
+    //retornara un valor numerico
+    public getUsuarioId(): number {
         return this.usuarioId;
     }
-    
+    //Metodo asincrono para obtener tods los productos que el usuario tenga en el carrito
     public async carrito(){
         try {
+            //Verificamos la conexion en caso de no tener la conexion a la base de datos en caso de no tener conexion 
+            //realizara el metodo para conectar la base de datos
             if(!this.db) await this.initDB();
-
+            //Obtenemos los datos de la vista creada que nos daran los productos que el usuario tenga almacenado en el carrito
             const { rows } = await this.db.execute(`select * from vista_carrito where id_usuario = ?;`, [this.getUsuarioId()]);
-
-            console.log(rows)
+            //Retornamos un JSON con estado 1 y con los datos listados de los objetos
             return {
                 estatus: 1,
                 info: {
                     message: "Listado de todos los productos dentro del carrito: ",
-                    data: []
+                    data: rows || []
                 }
-            }
+            };
         } catch (error) {
+            //En caso de error lo imprimimos en consola
             console.log(error);
+            //Retornamos un JSON con estado cero y con el data de los arreglos vacios
             return {
                 estatus: 0,
                 info: {
@@ -239,26 +243,32 @@ class Carrito extends Consultas {
             };
         }
     }
-
+    //Metodo asincrono para añadir productos en el carrito
+    //Donde el parametro que tenemos es el identificador del producto y la cantidad numerica
     public async addToCart(producto: number, cantidad: number) { 
         try {
+            //Obtendremos la conexion a la base de datos
             if(!this.db) await this.initDB();
-
+            //Inicializamos un objeto de tipo Productos
             const productoConsulta: Productos = new Productos(producto);
+            //Obtenemos el numero de existencia que tiene el producto
             const hasExistence: number = await productoConsulta.hasExistence();
-
+            //En caso de que hasExistence sea cero retornamos un estado en 2 dando a entender que el producto ya no tiene existencia
             if(!hasExistence) return {estatus: 2, result: {message: "El producto no tiene existencia"}};
+            //Si la existencia que tiene el producto es menor a la cantidad que quieren obtener se avisara de eso
             if(hasExistence < cantidad) return {estatus: 3, result: {message: "La cantidad es mayor a la existencia que se tiene"}};
-
+            //Se ejecuta el procedimiento almacenado para guardar los productos en el carrito o crear el pedido y almacenando el carrit
             await this.db.execute(
                 `call guardar_carrito(?,?,?, @estatus, @mensaje)`,
                 [this.getUsuarioId(), producto, cantidad]
             )
-
+            //Una vez se ejecuta el procedimiento anterior obtenemos las variables de salida
+            //que tiene el procedimiento almacenado anterior
             const [output] = await this.db.query(`select @estatus as estatus, @mensaje as mensaje`);
 
-            console.log(output)
+            //En caso de que el estado sea 2 retornaremos un JSON dando a entender que el ocurrio un error en sql 
             if(output.estatus === 2) return { estatus: 0, result: { message: "Ocurrio un error favor de intentarlo nuevamente mas tarde" }};
+            //En caso contrario retornamos un JSON de estado 1 avisando que el producto se ha guardado de manera correcta
             else
                 return {
                     estatus: 1, 
@@ -267,7 +277,9 @@ class Carrito extends Consultas {
                     }
                 };
         } catch (error) {
+            //De lo contrario imprimimos en consola el error
             console.log(error)
+            //Retornamos un JSON con estado 0 y el mensaje de error
             return {
                 estatus: 0,
                 result: {
@@ -276,19 +288,20 @@ class Carrito extends Consultas {
             };
         }
     }
-
+    //Metodo asincrono para actualizar el carrito
     public async updateCart(producto: number, action: string){
         try {
-            console.log(producto, action);
+            //Creamos la conexion a la base de datos
             if(!this.db) await this.initDB();
+            //Ejecutamos la consulta para poder actualizar los datos del mismo carrito
             await this.db.query(
                 `call actualizar_carrito(?, ?, ?, @estatus, @mensaje)`,
                 [this.getUsuarioId(), producto, action]);
-
+            //Obtenemos las variables de salida
             const [output] = await this.db.query(`select @estatus as estatus, @mensaje as mensaje`);
-
+            //En caso del que estado sea cero avisamos que ocurrio un error
             if(output.estatus === 0) return { estatus: 2, info: { message: "Ha ocurrido un error favor de intentarlo nuevamente" } };
-            
+            //En caso contrario retornamos un estado 1 avisando que todo ha salido bien
             return {
                 estatus: 1, 
                 info: {
@@ -296,7 +309,9 @@ class Carrito extends Consultas {
                 }
             };
         } catch (error) {
+            //En caso de error se imprime en consola
             console.log(error);
+            //Retornamos el estado 0 y un mensaje de error
             return {
                 estatus: 0,
                 info: {
@@ -305,19 +320,20 @@ class Carrito extends Consultas {
             };
         }
     }
-
+    //Metodo asincrono para borrar un producto del carrito
     public async deleteCart(producto: number){
         try {
+            //Realizamos la conexion a la base de datos
             if(!this.db) await this.initDB();
-
+            //Llamamos al procedimiento almacenado
             await this.db.execute(
                 `call eliminar_carrito(?, ?, @estatus, @mensaje)`
                 ,[this.getUsuarioId(), producto]);
-
+            //Obtenemos las variables de salida
             const [output] = await this.db.query(`select @estatus as estatus, @mensaje as mensaje`);
-
+            //En caso de que el estado sea 0 se avisara por medio de un JSON
             if(output.estatus === 0) return { estatus: 2, info: { message: "Ha ocurrido nu error favor de intentarlo de nuevo" }};
-
+            //En caso contrario retornamos un JSON con estado 1 avisando que el producto se elimino bien del carrito
             return {
                 estatus: 1,
                 info: {
@@ -325,7 +341,9 @@ class Carrito extends Consultas {
                 }
             };
         } catch (error) {
+            //En caos de error este se imprimira en consola
             console.log(error);
+            //Se retorna un JSON con estado 0 avisando sobre el error que se tiene
             return {
                 estatus: 0,
                 info: {
@@ -335,7 +353,7 @@ class Carrito extends Consultas {
         }
     }
 }
-
+//Se exportan cada uno de los objetos creados en la parte superior y asi poder utilizarlos en otros archivos
 export { 
     Usuarios, 
     Productos,
