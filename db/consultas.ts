@@ -353,9 +353,205 @@ class Carrito extends Consultas {
         }
     }
 }
+//Clase encargada de las acciones para accionar los productos como favoritos o no y listar los productos favoritos
+class Favoritos extends Consultas {
+    constructor( private usuarioId: number ) {
+        super()
+    }
+    //Getters
+    public getUsuarioId():number {
+        return this.usuarioId;
+    }
+    //Metodo para enlistar los productos marcados como favoritos del usuario
+    public async favorites(){
+        try {
+            if(!this.db) await this.initDB();
+
+            const { rows } = await this.db.execute(
+                `
+                    select 
+                     p.sku as sku,
+                     p.nombre as nombre,
+                     format(p.precio, 2) as precio,
+                     p.imagen as imagen,
+                     p.existencia as existencia
+                    from productos_favoritos pf
+                    inner join usuarios u on u.id = pf.usuario
+                    inner join productos p on p.id = pf.producto
+                    where pf.usuario = ?
+                    order by p.sku;
+                `
+                ,[this.getUsuarioId()]
+            );
+
+            return {
+                estatus: 1,
+                info: {
+                    message: "Listado de los productos favoritos del usuario",
+                    data: rows || []
+                }
+            };
+        } catch (error) {
+            console.log(error);
+            return {
+                estatus: 0,
+                info: {
+                    message: "Ha ocurrido un error: "+error,
+                    data: []
+                }
+            };
+        }
+    };
+    //Metodo para contar los productos favoritos marcados por el usuario
+    public async countFavs(): Promise<number>{
+        try {
+            if(!this.db) await this.initDB();
+
+            const [rows]= await this.db.query(`
+                select 
+                    count(*) as conteo
+                from productos_favoritos 
+                where usuario = ?`, 
+                [this.getUsuarioId()]);
+            return rows ? rows?.conteo : 0;
+        } catch (error) {
+            console.log(error);
+            return 0;
+        }
+    };
+    //Detecta si el producto que se pase por el parametro es un producto favorito o no
+    public async isFav(producto: number): Promise<boolean> {
+        try {
+            if(!this.db) await this.initDB();
+
+            const [rows] = await this.db.query(
+                `select 
+                    *
+                from productos_favoritos
+                where usuario = ?
+                and producto = ?;`
+                ,[this.getUsuarioId(), producto]
+            );
+
+            return rows?.producto ? true : false;
+        } catch (error) {
+            console.log(error);
+            return false
+        }
+    };
+    //Metodo para insertar producto como favorito
+    public async addToFav(producto: number){
+        try {
+            if(!this.db) await this.initDB();
+
+            const { rows } = await this.db.execute(
+                `select 
+                    * 
+                from productos_favoritos
+                where usuario = ?
+                and producto = ?;
+                `
+                ,[this.getUsuarioId(), producto]
+            );
+
+            console.log("Consulta total: ", (rows||[]));
+
+            if(!(rows || []).length){
+                console.log("Se va a insertar un producto como favoritos");
+                await this.db.execute(
+                    `insert into 
+                    productos_favoritos
+                    (usuario, producto)
+                    values
+                    (?,?);
+                    `,
+                    [this.getUsuarioId(), producto]
+                );
+            }
+
+            console.log(producto)
+            return {
+                estatus: 1,
+                info: {
+                    message: "Producto marcado como favorito"
+                }
+            };
+        } catch (error) {
+            console.log(error);
+            return {
+                estatus: 0,
+                info: {
+                    message: "Ha ocurrido un error: "+error
+                }
+            }
+        }
+    };
+    //Metodo para desmarcar un producto de favoritos
+    public async deleteToFav(producto: number){
+        try {
+            if(!this.db) await this.initDB();
+
+            const { rows } = await this.db.execute(
+                `select 
+                    *
+                from productos_favoritos
+                where usuario = ?
+                and producto = ?;`,
+                [this.getUsuarioId(), producto]
+            );
+
+            if((rows||[]).length) {
+                await this.db.execute(
+                    `delete 
+                    from productos_favoritos
+                    where usuario = ?
+                    and producto = ?;`,
+                    [this.getUsuarioId(), producto]
+                );
+            }
+
+            return {
+                estatus: 1,
+                info: {
+                    message: "Producto desmarcado de favoritos"
+                }
+            };
+        } catch (error) {
+            console.log(error);
+            return {
+                estatus: 0,
+                info: {
+                    message: "Ha ocurrido un error: "+error
+                }
+            }
+        }
+    };
+    //Metodo para decidir si marcarlo com favorito o no
+    public async decideAction(producto: number){
+        try {
+            if(!this.db) await this.initDB();
+
+            const isFav: boolean = await this.isFav(producto);
+
+            if(isFav) return await this.deleteToFav(producto)
+            else return await this.addToFav(producto);
+
+        } catch (error) {
+            console.log(error);
+            return {
+                estatus: 0,
+                info: {
+                    message: "Ha ocurrido un error: "+error
+                }
+            }
+        };
+    };
+}
+
 //Se exportan cada uno de los objetos creados en la parte superior y asi poder utilizarlos en otros archivos
 export { 
     Usuarios, 
     Productos,
-    Carrito
+    Carrito,
+    Favoritos
 };

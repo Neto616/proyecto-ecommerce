@@ -15,4 +15,4 @@ app.route("/", controllers)
 //Creamos una ruta para cuando intenten ingresar a una ruta que no exista puedan ver una respuesta y no solo una pantalla de error
 app.get("/*", (c: Context):Response => c.json({ estatus: 0, result: {info: "La ruta no existe"}}))
 //Inicializamos el servidor dandole el puerto al que se tendra que enlazar y le diremos que es una API
-Deno.serve({port: 3001}, app.fetch)
+Deno.serve({port: 3001}, app.fetch);
