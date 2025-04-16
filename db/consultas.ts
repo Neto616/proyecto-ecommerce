@@ -355,21 +355,28 @@ class Carrito extends Consultas {
 }
 //Clase encargada de las acciones para accionar los productos como favoritos o no y listar los productos favoritos
 class Favoritos extends Consultas {
+    //Creamos nuestro metodo constructor donde nuestro unica propiedad es el id del usuario siendo una propiedad numerica
     constructor( private usuarioId: number ) {
+        //Llamamos nuestro metodo usper para poder realizar los metodos de la clase a la que hereda
         super()
     }
     //Getters
     public getUsuarioId():number {
+        //Obtenemos la propiedad y la retornamos
         return this.usuarioId;
     }
     //Metodo para enlistar los productos marcados como favoritos del usuario
     public async favorites(pagina: number, cantidad: number){
+        //Ecapsulamos nuestra funcion en un try catch para poder capturar y manejar los errores que puedan suceder
         try {
+            //Verificamos la conexion y en caso de no haber realizamos nuestra conexion a la base de datos
             if(!this.db) await this.initDB();
-
+            //Creamos nuestras constantes numericas para obtener:
+            //Limite de los productos a mostrar por paginas
             const limit: number = cantidad;
+            //Numero por el cual empezaremos a mostrar dichos productos
             const offset: number = (pagina - 1) * cantidad;
-
+            //Obtenemos los resultados de la consulta que hemos realizado
             const { rows } = await this.db.execute(
                 `
                     select 
@@ -387,7 +394,8 @@ class Favoritos extends Consultas {
                 `
                 ,[this.getUsuarioId(), limit, offset]
             );
-
+            //Retornamos un JSON con el estado 1 y con los datos que obtuvimos en la consulta
+            //que nos brinda el sku, precio, nombre, existencia, imagen de los productos marcados como favoritos
             return {
                 estatus: 1,
                 info: {
@@ -401,38 +409,53 @@ class Favoritos extends Consultas {
                 }
             };
         } catch (error) {
+            //En caso de error imprimimos en consola el error que salio
             console.log(error);
+            //Retornamos un JSON con el estado en cero marcando que hubo un error junto con datos vacios para evitar errores en el front
             return {
                 estatus: 0,
                 info: {
                     message: "Ha ocurrido un error: "+error,
-                    data: []
+                    data: {
+                        productos: [],
+                        pagina: pagina,
+                        cantidad: cantidad,
+                        cantidadFavoritos: 0
+                    }
                 }
             };
         }
     };
     //Metodo para contar los productos favoritos marcados por el usuario
     public async countFavs(): Promise<number>{
+        //Encapsulamos nuestra funcion en un trycatch para poder tener control sobre posibles errores
         try {
+            //Realizamos nuestra conexion a la base de datos
             if(!this.db) await this.initDB();
-
+            //Obtenemos el resultadoo del conteo que nos da el script que realizamos
             const [rows]= await this.db.query(`
                 select 
                     count(*) as conteo
                 from productos_favoritos 
                 where usuario = ?`, 
                 [this.getUsuarioId()]);
+            //retornamos del objeto el conteo que nos da y en caso de que rows sea indefinido retornaremos un 0
             return rows ? rows?.conteo : 0;
         } catch (error) {
+            //En caso de error imprimiremos nuestro error en consola
             console.log(error);
+            //Y retornamos el valor 0 para cuando haya un error
             return 0;
         }
     };
     //Detecta si el producto que se pase por el parametro es un producto favorito o no
     public async isFav(producto: number): Promise<boolean> {
+        //Realizamos un try catch en nuestra funcion para asi controlar y manejar los errores
         try {
+            //Nos conectamos a la base de datos
             if(!this.db) await this.initDB();
-
+            //Con la consulta obtenemos si el producto esta marcado como favorito para el usuario
+            //o en caso de no existir traera undefined
             const [rows] = await this.db.query(
                 `select 
                     *
@@ -441,44 +464,34 @@ class Favoritos extends Consultas {
                 and producto = ?;`
                 ,[this.getUsuarioId(), producto]
             );
-
+            //verificamos que rows tenga la propiedad producto en caso de no existir la propiedad marcaremos falso y en caso de si existir marcaremos true
             return rows?.producto ? true : false;
         } catch (error) {
+            //En caso de error marcamos el error en consola
             console.log(error);
+            //Retornamos falso para el contorl de este metodo
             return false
         }
     };
     //Metodo para insertar producto como favorito
     public async addToFav(producto: number){
+        //Los ponemos en un try catch para obtener y manejar nuestro errores
         try {
+            //Realizamos nuestra conexión a la base de datos
             if(!this.db) await this.initDB();
 
-            const { rows } = await this.db.execute(
-                `select 
-                    * 
-                from productos_favoritos
-                where usuario = ?
-                and producto = ?;
-                `
-                ,[this.getUsuarioId(), producto]
+            //Ejecutamos un script que en este caso inserta en la tabla productos_favoritos
+            //el producto y el usuario que queremos marcar
+            await this.db.execute(
+                `insert into 
+                productos_favoritos
+                (usuario, producto)
+                values
+                (?,?);
+                `,
+                [this.getUsuarioId(), producto]
             );
-
-            console.log("Consulta total: ", (rows||[]));
-
-            if(!(rows || []).length){
-                console.log("Se va a insertar un producto como favoritos");
-                await this.db.execute(
-                    `insert into 
-                    productos_favoritos
-                    (usuario, producto)
-                    values
-                    (?,?);
-                    `,
-                    [this.getUsuarioId(), producto]
-                );
-            }
-
-            console.log(producto)
+            //Retornamos un estado en 1 en un JSON para controlarlo en los controladores
             return {
                 estatus: 1,
                 info: {
@@ -486,7 +499,9 @@ class Favoritos extends Consultas {
                 }
             };
         } catch (error) {
+            //En caos de error impimimos en consola el error
             console.log(error);
+            //Retornamos un estado 0 para dar a entender que ha sucedido un error
             return {
                 estatus: 0,
                 info: {
@@ -497,28 +512,19 @@ class Favoritos extends Consultas {
     };
     //Metodo para desmarcar un producto de favoritos
     public async deleteToFav(producto: number){
+        //Ponemos un trycatch para el control de errores
         try {
-            if(!this.db) await this.initDB();
-
-            const { rows } = await this.db.execute(
-                `select 
-                    *
+            //Nos conectamos a la base de datos
+            if(!this.db) await this.initDB(); 
+            //Borramos el producto de la tabla
+            await this.db.execute(
+                `delete 
                 from productos_favoritos
                 where usuario = ?
                 and producto = ?;`,
                 [this.getUsuarioId(), producto]
             );
-
-            if((rows||[]).length) {
-                await this.db.execute(
-                    `delete 
-                    from productos_favoritos
-                    where usuario = ?
-                    and producto = ?;`,
-                    [this.getUsuarioId(), producto]
-                );
-            }
-
+            //Retoramos un estado de 1 para dar a entender que todo salio bien
             return {
                 estatus: 1,
                 info: {
@@ -526,7 +532,9 @@ class Favoritos extends Consultas {
                 }
             };
         } catch (error) {
+            //En caso de error lo imprimimos en consola
             console.log(error);
+            //Retornamos un estado de cero para marcar que ha sucedido un error
             return {
                 estatus: 0,
                 info: {
@@ -535,18 +543,21 @@ class Favoritos extends Consultas {
             }
         }
     };
-    //Metodo para decidir si marcarlo com favorito o no
+    //Metodo para decidir si marcarlo como favorito o quitarlo de favoritos
     public async decideAction(producto: number){
         try {
+            //Realizamos nuestra conexión a la base de datos
             if(!this.db) await this.initDB();
-
+            //Creamos un variable booleana y llamamos al metodo isFav para saber si el producto esta marcado o no como favorito
             const isFav: boolean = await this.isFav(producto);
-
-            if(isFav) return await this.deleteToFav(producto)
+            //En caso de ser favorito lo vamos a quitar de la lista
+            if(isFav) return await this.deleteToFav(producto);
+            //En caso contrario lo vamos a añadir a favoritos
             else return await this.addToFav(producto);
-
         } catch (error) {
+            //En caso de error imprimimos en consola el error que tendremos
             console.log(error);
+            //Retornamos un estado de cero dando a entender que ha sucedido un error
             return {
                 estatus: 0,
                 info: {
