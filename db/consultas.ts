@@ -363,9 +363,12 @@ class Favoritos extends Consultas {
         return this.usuarioId;
     }
     //Metodo para enlistar los productos marcados como favoritos del usuario
-    public async favorites(){
+    public async favorites(pagina: number, cantidad: number){
         try {
             if(!this.db) await this.initDB();
+
+            const limit: number = cantidad;
+            const offset: number = (pagina - 1) * cantidad;
 
             const { rows } = await this.db.execute(
                 `
@@ -379,16 +382,22 @@ class Favoritos extends Consultas {
                     inner join usuarios u on u.id = pf.usuario
                     inner join productos p on p.id = pf.producto
                     where pf.usuario = ?
-                    order by p.sku;
+                    order by p.sku
+                    limit ?  offset ?;
                 `
-                ,[this.getUsuarioId()]
+                ,[this.getUsuarioId(), limit, offset]
             );
 
             return {
                 estatus: 1,
                 info: {
                     message: "Listado de los productos favoritos del usuario",
-                    data: rows || []
+                    data: {
+                        productos: rows || [],
+                        pagina: pagina,
+                        cantidad: cantidad,
+                        cantidadFavoritos: await this.countFavs()
+                    }
                 }
             };
         } catch (error) {
