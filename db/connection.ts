@@ -1,5 +1,6 @@
 // Importamos la libreria para poder conectarno a nuestra base de datos
 // En este caso usaremos el objeto Client para poder realizar la conexion
+import { DenoStdInternalError } from "https://deno.land/std@0.104.0/_util/assert.ts";
 import { Client } from "https://deno.land/x/mysql/mod.ts";
 
 //Inicializamos nuestra constante de tipo Client
@@ -25,10 +26,10 @@ abstract class Consultas {
             //Llamamos a nuestra constante connection e ingresamos a su metodo connect y le damos los datos necesarios para poder realizar
             //la conexion que se espera
             await connection.connect({
-                hostname: "localhost", //Nombre de donde se aloja la base de datos
-                username: "root",      //Nombre del usuario donde nos vamos a conectar
-                db: "ecommerce",       //Nombre de la base de datos a la que nos conectamos
-                password: "Neto_616",  //Contraseña del usuario
+                hostname: Deno.env.get("HOST"), //Nombre de donde se aloja la base de datos
+                username: Deno.env.get("USR"),      //Nombre del usuario donde nos vamos a conectar
+                db: Deno.env.get("DB"),       //Nombre de la base de datos a la que nos conectamos
+                password: Deno.env.get("PASS"),  //Contraseña del usuario
             })
             
             this.db = connection    //Le damos a la propiedad db su valor que sera connection
