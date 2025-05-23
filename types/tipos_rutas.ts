@@ -11,6 +11,7 @@ export type vistas_usuarios = {
 export type vistas_productos = {
     todos: (c:Context) => Promise<Response>,
     detalle: (c:Context) => Promise<Response>,
+    favoritos: (c:Context) => Promise<Response>,
 };
 
 export type controladores_usuario = {
@@ -20,7 +21,12 @@ export type controladores_usuario = {
     iniciar_sesion: (c: Context) => Promise<Response>
 };
 
-export type controladres_productos = {
-    favorito: (c: Context) => Promise<Response>,
-    agregar_carrito: (c: Context) => Promise<Response>
+export type controladores_productos = {
 };
+
+export type controladores_carrito = {
+};
+
+export type controladores_favoritos = {
+    decideAction: (c: Context) => Promise<Response>,
+}

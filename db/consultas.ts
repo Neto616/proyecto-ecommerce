@@ -76,7 +76,7 @@ class Usuarios extends Consultas{
             )
             //retornamos el estado de 1 que nos dice que todo estabien y tambien daremos los resultados que obtuvimos en la consulta
             return {
-                estatus: 1, 
+                estatus: rows?.length ? 1 : 2, 
                 result: rows
             };
         } catch (error) {

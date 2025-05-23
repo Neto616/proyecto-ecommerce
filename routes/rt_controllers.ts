@@ -1,6 +1,6 @@
 //Importamos las paqueterias necesarias
 import { Hono } from "hono";
-import usuarios_abc from "../controllers/ctrl_controllers.ts";
+import { usuarios_abc   } from "../controllers/ctrl_controllers.ts";
 //Inicializamos nuestro objeto Hono
 const route: Hono= new Hono()
 //Creamos y nombramos las rutas que se van a utilizar en el API

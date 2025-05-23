@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Carrito de Compras</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="burger-button" aria-label="Menú de Categorías">
+          <i class="fas fa-bars"></i>
+        </button>
+        <a href="index.html" class="logo">Mi Tienda</a>
+      </div>
+      <div class="top-bar-center">
+        <div class="search-bar">
+          <input type="text" placeholder="Buscar productos..." />
+          <button type="submit" aria-label="Buscar">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+      <div class="top-bar-right">
+        <a href="cart.html" class="icon-link" aria-label="Carrito de Compras">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-count">2</span>
+        </a>
+        <a href="favorites.html" class="icon-link" aria-label="Favoritos">
+          <i class="fas fa-heart"></i>
+        </a>
+        <a href="my-account.html" class="icon-link" aria-label="Mi Cuenta">
+          <i class="fas fa-user-circle"></i>
+        </a>
+      </div>
+    </header>
+
+    <nav class="sidebar-menu">
+      <button class="close-sidebar-button"><i class="fas fa-times"></i></button>
+      <h3>Categorías</h3>
+      <ul>
+        <li><a href="#">Electrónica</a></li>
+        <li><a href="#">Ropa y Accesorios</a></li>
+        <li><a href="#">Hogar y Jardín</a></li>
+        <li><a href="#">Libros</a></li>
+        <li><a href="#">Deportes</a></li>
+        <li><a href="#">Juguetes</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content">
+      <section class="page-header">
+        <h1>Carrito de Compras</h1>
+      </section>
+
+      <section class="cart-layout">
+        <div class="cart-items">
+          <div class="cart-item">
+            <img
+              src="https://via.placeholder.com/100x100?text=Producto+A"
+              alt="Producto A"
+            />
+            <div class="item-details">
+              <h3>Nombre del Producto A Muy Largo para Prueba</h3>
+              <p class="item-price">$120.00</p>
+              <div class="quantity-selector">
+                <button class="decrement-qty">-</button>
+                <input
+                  type="number"
+                  value="1"
+                  min="1"
+                  class="item-quantity"
+                  data-price="120.00"
+                />
+                <button class="increment-qty">+</button>
+              </div>
+            </div>
+            <div class="item-actions">
+              <p class="item-total">$120.00</p>
+              <button class="remove-item-btn">
+                <i class="fas fa-trash-alt"></i> Eliminar
+              </button>
+            </div>
+          </div>
+
+          <div class="cart-item">
+            <img
+              src="https://via.placeholder.com/100x100?text=Producto+B"
+              alt="Producto B"
+            />
+            <div class="item-details">
+              <h3>Nombre del Producto B</h3>
+              <p class="item-price">$45.50</p>
+              <div class="quantity-selector">
+                <button class="decrement-qty">-</button>
+                <input
+                  type="number"
+                  value="2"
+                  min="1"
+                  class="item-quantity"
+                  data-price="45.50"
+                />
+                <button class="increment-qty">+</button>
+              </div>
+            </div>
+            <div class="item-actions">
+              <p class="item-total">$91.00</p>
+              <button class="remove-item-btn">
+                <i class="fas fa-trash-alt"></i> Eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="cart-summary">
+          <h2>Resumen del Carrito</h2>
+          <div class="summary-line">
+            <span>Subtotal:</span>
+            <span id="subtotal">$211.00</span>
+          </div>
+          <div class="summary-line">
+            <span>Envío:</span>
+            <span id="shipping">$15.00</span>
+          </div>
+          <div class="summary-line total">
+            <span>Total:</span>
+            <span id="grand-total">$226.00</span>
+          </div>
+          <button class="btn-primary checkout-btn">Proceder al Pago</button>
+          <a href="index.html" class="continue-shopping-link"
+            >Continuar Comprando</a
+          >
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // Script para el menú hamburguesa
+      document
+        .querySelector(".burger-button")
+        .addEventListener("click", function () {
+          document.querySelector(".sidebar-menu").classList.add("active");
+        });
+      document
+        .querySelector(".close-sidebar-button")
+        .addEventListener("click", function () {
+          document.querySelector(".sidebar-menu").classList.remove("active");
+        });
+
+      // Lógica para actualizar cantidades y totales en el carrito
+      function updateCartTotals() {
+        let subtotal = 0;
+        document.querySelectorAll(".cart-item").forEach((item) => {
+          const quantityInput = item.querySelector(".item-quantity");
+          const pricePerItem = parseFloat(quantityInput.dataset.price);
+          const quantity = parseInt(quantityInput.value);
+          const itemTotalElement = item.querySelector(".item-total");
+
+          const itemTotal = pricePerItem * quantity;
+          itemTotalElement.textContent = `$${itemTotal.toFixed(2)}`;
+          subtotal += itemTotal;
+        });
+
+        const shippingCost = 15.0; // Costo de envío fijo de ejemplo
+        const grandTotal = subtotal + shippingCost;
+
+        document.getElementById("subtotal").textContent = `$${subtotal.toFixed(
+          2
+        )}`;
+        document.getElementById(
+          "shipping"
+        ).textContent = `$${shippingCost.toFixed(2)}`;
+        document.getElementById(
+          "grand-total"
+        ).textContent = `$${grandTotal.toFixed(2)}`;
+
+        // Actualizar el contador del carrito en la top bar
+        document.querySelector(".cart-count").textContent =
+          document.querySelectorAll(".cart-item").length;
+      }
+
+      document.querySelectorAll(".increment-qty").forEach((button) => {
+        button.addEventListener("click", function () {
+          const quantityInput = this.previousElementSibling;
+          quantityInput.value = parseInt(quantityInput.value) + 1;
+          updateCartTotals();
+        });
+      });
+
+      document.querySelectorAll(".decrement-qty").forEach((button) => {
+        button.addEventListener("click", function () {
+          const quantityInput = this.nextElementSibling;
+          if (parseInt(quantityInput.value) > 1) {
+            quantityInput.value = parseInt(quantityInput.value) - 1;
+            updateCartTotals();
+          }
+        });
+      });
+
+      document.querySelectorAll(".remove-item-btn").forEach((button) => {
+        button.addEventListener("click", function () {
+          this.closest(".cart-item").remove();
+          updateCartTotals(); // Recalcular después de eliminar
+          alert("Producto eliminado del carrito (simulado)");
+        });
+      });
+
+      // Inicializar los totales al cargar la página
+      updateCartTotals();
+    </script>
+  </body>
+</html>

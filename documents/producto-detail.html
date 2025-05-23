@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalle del Producto - Nombre del Producto</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="burger-button" aria-label="Menú de Categorías">
+          <i class="fas fa-bars"></i>
+        </button>
+        <a href="index.html" class="logo">Mi Tienda</a>
+      </div>
+      <div class="top-bar-center">
+        <div class="search-bar">
+          <input type="text" placeholder="Buscar productos..." />
+          <button type="submit" aria-label="Buscar">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+      <div class="top-bar-right">
+        <a href="#" class="icon-link" aria-label="Carrito de Compras">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-count">0</span>
+        </a>
+        <a href="#" class="icon-link" aria-label="Favoritos">
+          <i class="fas fa-heart"></i>
+        </a>
+        <a href="my-account.html" class="icon-link" aria-label="Mi Cuenta">
+          <i class="fas fa-user-circle"></i>
+        </a>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="product-detail-container">
+        <div class="product-gallery">
+          <div class="main-image">
+            <img
+              src="https://via.placeholder.com/600x600?text=Producto+Principal"
+              alt="Producto Principal"
+            />
+          </div>
+          <div class="thumbnails">
+            <img
+              src="https://via.placeholder.com/80x80?text=Vista+1"
+              alt="Vista 1"
+              class="active"
+            />
+            <img
+              src="https://via.placeholder.com/80x80?text=Vista+2"
+              alt="Vista 2"
+            />
+            <img
+              src="https://via.placeholder.com/80x80?text=Vista+3"
+              alt="Vista 3"
+            />
+            <img
+              src="https://via.placeholder.com/80x80?text=Vista+4"
+              alt="Vista 4"
+            />
+          </div>
+        </div>
+
+        <div class="product-info">
+          <h1>Nombre del Producto Increíble y Novedoso</h1>
+          <p class="price">$499.99</p>
+          <p class="description">
+            Este es un producto fantástico con características increíbles.
+            Perfecto para todas tus necesidades, diseñado con los mejores
+            materiales para garantizar durabilidad y rendimiento. Lorem ipsum
+            dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
+            incididunt ut labore et dolore magna aliqua.
+          </p>
+
+          <div class="product-options">
+            <label for="color">Color:</label>
+            <select id="color">
+              <option value="rojo">Rojo</option>
+              <option value="azul">Azul</option>
+              <option value="verde">Verde</option>
+            </select>
+
+            <label for="size">Talla/Tamaño:</label>
+            <select id="size">
+              <option value="s">Pequeño</option>
+              <option value="m">Mediano</option>
+              <option value="l">Grande</option>
+            </select>
+
+            <label for="quantity">Cantidad:</label>
+            <div class="quantity-selector">
+              <button id="decrement-qty">-</button>
+              <input type="number" id="quantity" value="1" min="1" max="10" />
+              <button id="increment-qty">+</button>
+            </div>
+          </div>
+
+          <div class="action-buttons">
+            <button class="btn-primary">
+              <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+            </button>
+            <button class="btn-favorite">
+              <i class="far fa-heart"></i> Añadir a Favoritos
+            </button>
+          </div>
+
+          <div class="additional-info">
+            <h3>Características Técnicas</h3>
+            <ul>
+              <li>Material: Plástico ABS de alta resistencia</li>
+              <li>Dimensiones: 10x15x5 cm</li>
+              <li>Peso: 200g</li>
+              <li>Garantía: 1 año</li>
+            </ul>
+            <h3>Opiniones de Clientes</h3>
+            <p>¡Excelente producto, muy satisfecho! - Juan Pérez</p>
+            <p>Lo recomiendo ampliamente. - María García</p>
+          </div>
+        </div>
+      </div>
+
+      <section class="related-products">
+        <h2>Productos Relacionados</h2>
+        <div class="product-grid">
+          <div class="product-card">
+            <img
+              src="https://via.placeholder.com/250x200?text=Relacionado+1"
+              alt="Relacionado 1"
+            />
+            <i class="fas fa-heart favorite-icon"></i>
+            <div class="product-card-info">
+              <h3>Producto Relacionado A</h3>
+              <p class="price">$120.00</p>
+              <button class="add-to-cart-btn">
+                <i class="fas fa-shopping-cart"></i> Agregar
+              </button>
+            </div>
+          </div>
+          <div class="product-card">
+            <img
+              src="https://via.placeholder.com/250x200?text=Relacionado+2"
+              alt="Relacionado 2"
+            />
+            <i class="fas fa-heart favorite-icon"></i>
+            <div class="product-card-info">
+              <h3>Producto Relacionado B</h3>
+              <p class="price">$85.00</p>
+              <button class="add-to-cart-btn">
+                <i class="fas fa-shopping-cart"></i> Agregar
+              </button>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // Script para cambiar la imagen principal al hacer clic en las miniaturas
+      document.querySelectorAll(".thumbnails img").forEach((thumbnail) => {
+        thumbnail.addEventListener("click", function () {
+          document
+            .querySelector(".thumbnails img.active")
+            ?.classList.remove("active");
+          this.classList.add("active");
+          document.querySelector(".main-image img").src = this.src;
+        });
+      });
+
+      // Script para el selector de cantidad
+      document
+        .getElementById("increment-qty")
+        .addEventListener("click", function () {
+          const quantityInput = document.getElementById("quantity");
+          quantityInput.value = parseInt(quantityInput.value) + 1;
+        });
+
+      document
+        .getElementById("decrement-qty")
+        .addEventListener("click", function () {
+          const quantityInput = document.getElementById("quantity");
+          if (parseInt(quantityInput.value) > 1) {
+            quantityInput.value = parseInt(quantityInput.value) - 1;
+          }
+        });
+
+      // Script para el botón de favoritos en la página de detalle
+      document
+        .querySelector(".btn-favorite")
+        .addEventListener("click", function () {
+          const icon = this.querySelector("i");
+          icon.classList.toggle("far"); // Corazón vacío
+          icon.classList.toggle("fas"); // Corazón lleno
+          // Aquí puedes añadir la lógica para guardar/eliminar de favoritos
+        });
+
+      // Burger menu for product detail page (same as index.html)
+      document
+        .querySelector(".burger-button")
+        .addEventListener("click", function () {
+          document.querySelector(".sidebar-menu").classList.add("active");
+        });
+
+      document
+        .querySelector(".close-sidebar-button")
+        .addEventListener("click", function () {
+          document.querySelector(".sidebar-menu").classList.remove("active");
+        });
+    </script>
+  </body>
+</html>

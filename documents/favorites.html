@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mis Favoritos</title>
+    <link rel="stylesheet" href="css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
+    />
+  </head>
+  <body>
+    <header class="top-bar">
+      <div class="top-bar-left">
+        <button class="burger-button" aria-label="Menú de Categorías">
+          <i class="fas fa-bars"></i>
+        </button>
+        <a href="index.html" class="logo">Mi Tienda</a>
+      </div>
+      <div class="top-bar-center">
+        <div class="search-bar">
+          <input type="text" placeholder="Buscar productos..." />
+          <button type="submit" aria-label="Buscar">
+            <i class="fas fa-search"></i>
+          </button>
+        </div>
+      </div>
+      <div class="top-bar-right">
+        <a href="cart.html" class="icon-link" aria-label="Carrito de Compras">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="cart-count">0</span>
+        </a>
+        <a href="favorites.html" class="icon-link" aria-label="Favoritos">
+          <i class="fas fa-heart"></i>
+        </a>
+        <a href="my-account.html" class="icon-link" aria-label="Mi Cuenta">
+          <i class="fas fa-user-circle"></i>
+        </a>
+      </div>
+    </header>
+
+    <nav class="sidebar-menu">
+      <button class="close-sidebar-button"><i class="fas fa-times"></i></button>
+      <h3>Categorías</h3>
+      <ul>
+        <li><a href="#">Electrónica</a></li>
+        <li><a href="#">Ropa y Accesorios</a></li>
+        <li><a href="#">Hogar y Jardín</a></li>
+        <li><a href="#">Libros</a></li>
+        <li><a href="#">Deportes</a></li>
+        <li><a href="#">Juguetes</a></li>
+      </ul>
+    </nav>
+
+    <main class="main-content">
+      <section class="page-header">
+        <h1>Mis Favoritos</h1>
+      </section>
+
+      <section class="favorites-grid product-grid">
+        <div class="product-card">
+          <img
+            src="https://via.placeholder.com/250x200?text=Favorito+1"
+            alt="Laptop Ultrabook"
+          />
+          <i class="fas fa-heart favorite-icon active"></i>
+          <div class="product-card-info">
+            <h3>Laptop Ultrabook XYZ Pro</h3>
+            <p class="price">$1200.00</p>
+            <button class="add-to-cart-btn">
+              <i class="fas fa-shopping-cart"></i> Agregar
+            </button>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <img
+            src="https://via.placeholder.com/250x200?text=Favorito+2"
+            alt="Auriculares Bluetooth"
+          />
+          <i class="fas fa-heart favorite-icon active"></i>
+          <div class="product-card-info">
+            <h3>Auriculares Bluetooth SuperBass</h3>
+            <p class="price">$75.00</p>
+            <button class="add-to-cart-btn">
+              <i class="fas fa-shopping-cart"></i> Agregar
+            </button>
+          </div>
+        </div>
+
+        <div class="product-card">
+          <img
+            src="https://via.placeholder.com/250x200?text=Favorito+3"
+            alt="Smartwatch"
+          />
+          <i class="fas fa-heart favorite-icon active"></i>
+          <div class="product-card-info">
+            <h3>Smartwatch Fitness Tracker</h3>
+            <p class="price">$199.99</p>
+            <button class="add-to-cart-btn">
+              <i class="fas fa-shopping-cart"></i> Agregar
+            </button>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      // Script para el menú hamburguesa (igual que en index.html)
+      document
+        .querySelector(".burger-button")
+        .addEventListener("click", function () {
+          document.querySelector(".sidebar-menu").classList.add("active");
+        });
+      document
+        .querySelector(".close-sidebar-button")
+        .addEventListener("click", function () {
+          document.querySelector(".sidebar-menu").classList.remove("active");
+        });
+
+      // Script para quitar de favoritos desde la vista de favoritos
+      document
+        .querySelectorAll(".favorites-grid .favorite-icon")
+        .forEach((icon) => {
+          icon.addEventListener("click", function () {
+            // Aquí deberías añadir la lógica para eliminar el producto de los favoritos
+            // Por ahora, solo lo quita visualmente y simula la acción
+            this.closest(".product-card").remove();
+            alert("Producto eliminado de favoritos (simulado)");
+          });
+        });
+    </script>
+  </body>
+</html>

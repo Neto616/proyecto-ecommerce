@@ -4,7 +4,8 @@ import { Context } from "hono";
 import { getCookie, setCookie} from 'hono/cookie'
 //Importamos los modulos que generamos de nuestor proyecto
 import { controladores_usuario } from "../types/tipos_rutas.ts";
-import {Usuarios} from '../db/consultas.ts';
+import {Favoritos, Usuarios} from '../db/consultas.ts';
+import { controladores_favoritos } from '../types/tipos_rutas.ts';
 
 //Generamos nuestra constante que sera un JSON del tipo asignado con las funciones necesarias para 
 //ser llamadas en la ruta correspondiente
@@ -96,4 +97,27 @@ const usuarios_abc: controladores_usuario = {
     }
 }
 
-export default usuarios_abc
+const favorites_abc: controladores_favoritos = {
+    decideAction: async (c: Context) => {
+        try {
+            const { producto } = await c.req.json(); //Obtenemos del JSON que nos llega el atributo producto de manera especifica
+            const productoID = parseInt(producto || "0"); //Obtenemos el identificador de nuestro producto
+            const session = JSON.parse(getCookie(c, 'usuario_cookie') || "{id: 0}"); //Obtenemos la sesión del usuario para saber a quien le pertenece la cuenta
+
+            const favorito: Favoritos = new Favoritos(session.id); //Dentro de este objeto pondremos el identificador del usuario que se traera en base a la cookie que se tenga guardada
+            const resultado = favorito.decideAction(productoID); //Decidimos si el producto se va a marcar como favorito o se va a desmarcar de la lista de favoritos
+            //Retornamos el valor que nos devuelva nuestro metodo
+            return c.json( resultado );
+        } catch (error) {
+            //En caso de error imprimimos el error en consola
+            console.log(error);
+            //Retonramos un estado de cero para mencionar que ha ocurrido un error
+            return c.json({ estatus: 0 })
+        }
+    },
+}
+
+export { 
+    usuarios_abc, 
+    favorites_abc
+}

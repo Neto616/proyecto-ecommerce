@@ -1,7 +1,7 @@
 // Importamos el modulo necesario de la paqueteria hono
 import { Context } from "hono";
 // Importamos los modulos que generamos dentro del proyecto
-import { Usuarios } from "../db/consultas.ts";
+import { Favoritos, Usuarios } from "../db/consultas.ts";
 import { vistas_productos, vistas_usuarios } from "../types/tipos_rutas.ts";
 import { Productos } from "../db/consultas.ts";
 
@@ -19,8 +19,9 @@ const usuarios:vistas_usuarios= {
       try {
         //El correo vendrá en el header de nuestra llamada a la petición 
         const correo = c.req.header("correo");
+        console.log(correo)
         const { estatus, result } = (await Usuarios.isExist(correo?.toString() || ""));
-
+        console.log(estatus)
         if(estatus == 0) return c.redirect("/"); //Ocurrio un error asi que se llevara al inicio
         if(estatus == 2) return c.json({ estatus: 2 }) //Estaria dando datos para crear cuenta
         return c.json({ estatus: 1 }) //Estaria dando a iniciar sesion
@@ -75,6 +76,32 @@ const productos:vistas_productos= {
                 info: "Error",
                 error: error
             }})
+        }
+    },
+    favoritos: async (c: Context) => {
+        try {
+            const { p } = c.req.query();
+            const paginas: number = parseInt(p || "1");
+
+            const peticion: Favoritos = new Favoritos(2);
+            const resultado = await peticion.favorites(paginas, 10);
+
+            return c.json(resultado);
+        } catch (error) {
+            console.log(error); 
+
+            return c.json({
+                estatus: 0,
+                info: {
+                    message: "Ha ocurrido un error: "+error,
+                    data: {
+                        productos: [],
+                        pagina: 1,
+                        cantidad: 10,
+                        cantidadFavoritos: 0
+                    }
+                }
+            });
         }
     }
 }
