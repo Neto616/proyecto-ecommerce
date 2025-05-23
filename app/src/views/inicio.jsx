@@ -11,7 +11,7 @@ function Inicio() {
             <section className="hero-banner">
                 <h1>Grandes Ofertas, Grandes Sonrisas</h1>
                 <p>Descubre lo último en tecnología, moda y mucho más.</p>
-                <Link to="/todos_productos" className="btn-primary">Ver Productos</Link>
+                <Link to="/productos" className="btn-primary">Ver Productos</Link>
             </section>
             
             <section className="product-grid-section">

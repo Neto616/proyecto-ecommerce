@@ -11,3 +11,63 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
+.filters-and-sort {
+    background-color: #f0f0f0;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 30px;
+    display: flex; /* Importante para que los botones se pongan en línea */
+    flex-wrap: wrap; /* Permite que los elementos se envuelvan en pantallas pequeñas */
+    align-items: center; /* Alinea verticalmente los elementos */
+    gap: 15px; /* Espacio entre el título y los botones */
+}
+
+.filters-and-sort h3 {
+    margin: 0; /* Quita el margen por defecto de los h3 */
+    font-size: 1.1em;
+    color: #555;
+    flex-shrink: 0; /* Evita que el título se encoja en pantallas pequeñas */
+}
+
+.sort-options {
+    display: flex; /* Para que los botones de ordenar se pongan en línea */
+    flex-wrap: wrap; /* Permite que los botones se envuelvan */
+    gap: 10px; /* Espacio entre los botones de ordenar */
+}
+
+.sort-btn {
+    background-color: #007bff; /* Color de fondo del botón */
+    color: white; /* Color del texto */
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95em;
+    display: inline-flex; /* Permite alinear el texto y el icono */
+    align-items: center; /* Alinea verticalmente el texto y el icono */
+    gap: 8px; /* Espacio entre texto y icono */
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out; /* Animaciones */
+}
+
+.sort-btn:hover {
+    background-color: #0056b3; /* Color al pasar el ratón */
+    transform: translateY(-1px); /* Pequeño efecto al pasar el mouse */
+}
+
+.sort-btn.active { /* Para cuando el botón está activo */
+    background-color: #0056b3;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2); /* Efecto de "presionado" */
+}
+
+/* --- Ajustes para responsive si es necesario --- */
+@media (max-width: 768px) {
+    .filters-and-sort {
+        flex-direction: column; /* Apila los elementos en pantallas pequeñas */
+        align-items: flex-start; /* Alinea a la izquierda */
+    }
+    .sort-options {
+        width: 100%; /* Los botones ocupan todo el ancho */
+        justify-content: center; /* Centra los botones si se apilan */
+    }
+}
