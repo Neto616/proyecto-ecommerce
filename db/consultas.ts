@@ -170,7 +170,7 @@ class Productos extends Consultas{
         }
     }
     //Metodo estatico asincorno que trae el listado de los produtos
-    public static async mostrarTodos(section: string | undefined, offset: number, limit: number = 10){
+    public static async mostrarTodos(busqueda: string | undefined, section: string | undefined, filtro: string | undefined, offset: number, limit: number = 10){
         try {
             const conectar = new Productos();
             if(!conectar.db) await conectar.initDB(); //Conectamos a base de datos
@@ -179,7 +179,7 @@ class Productos extends Consultas{
                 select 
                     count(*) as total
                 from productos
-                where estatus = 1 ${section ? "and categoria = ?" : ""}`, [section])
+                where estatus = 1 ${busqueda ? `and nombre like '${busqueda}'` : ""} ${section ? "and categoria = ?" : ""}`, [section])
 
             const pagina = (offset - 1) * limit;
             let paginaMax: number; 
@@ -188,10 +188,15 @@ class Productos extends Consultas{
 
             const { rows } = await conectar.db.execute(`
                 select 
-                    * 
+                    *,
+                    FORMAT(precio, 2) as precio_format
                 from productos
-                where estatus = 1 ${section ? "and categoria = ?" : ""}
-                order by id desc
+                where estatus = 1 ${busqueda ? `and nombre like '${busqueda}'` : ""} ${section ? "and categoria = ?" : ""}
+                ${filtro == "1" ? "order by precio asc"
+                    : filtro == "2" ? "order by precio desc"
+                    : filtro == "3" ? "order by nombre asc"
+                    : filtro == "4" ? "order by nombre desc"
+                    : "order by id desc"}
                 limit ? offset ?;`, [section ?? limit, section ? limit : pagina, pagina]);
             //Retonramos un estado 1 y el listado de cada uno de los productos que se tengan en base de datos
             return {estatus: 1, result: {info: "Listado de productos", data: rows, pagina_actual: offset, pagina_maxima: paginaMax, limite: limit }};
@@ -216,7 +221,6 @@ class Productos extends Consultas{
                 "select *, FORMAT(precio, 2) as precio_format from productos where categoria = ? and sku not like ? and estatus = 1 limit 4",
                 [rows[0].categoria, rows[0].sku])
 
-            console.log("Detalle del producto", rows);
             return {estatus: 1, result: {info: "Detalle de producto", data: rows, productos_relacionados: productos_relacionados.rows}};
         } catch (error) {
             console.log(error);
@@ -229,7 +233,7 @@ class Productos extends Consultas{
             const conectar = new Productos();
             if(!conectar.db) await conectar.initDB();
 
-            const { rows } = await conectar.db.execute( `select * from productos limit 4` );
+            const { rows } = await conectar.db.execute( `select *,  FORMAT(precio, 2) as precio_format from productos limit 4` );
 
             return {
                 estatus: 1,

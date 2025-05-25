@@ -501,27 +501,27 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #fff;
-    padding: 15px 30px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    padding: 10px 20px;
+    background-color: #f8f8f8;
+    border-bottom: 1px solid #eee;
+    position: relative; /* Importante para el z-index y el dropdown */
+    z-index: 1000; /* Asegura que esté por encima de otros elementos */
 }
 
 .top-bar-left,
 .top-bar-right {
     display: flex;
     align-items: center;
-    gap: 20px;
+    gap: 20px; 
 }
 
+
 .logo {
-    font-size: 1.8em;
+    font-size: 24px;
     font-weight: bold;
-    color: #007bff;
+    color: #333;
     text-decoration: none;
-    white-space: nowrap; /* Prevent logo from wrapping */
+    margin-left: 15px;
 }
 
 .burger-button {
@@ -530,6 +530,34 @@ body {
     font-size: 1.5em;
     cursor: pointer;
     color: #333;
+}
+
+.burger-menu-btn,
+.search-btn {
+    background: none;
+    border: none;
+    font-size: 20px;
+    cursor: pointer;
+    color: #555;
+    padding: 5px;
+}
+
+.cart-link,
+.favorites-link,
+.account-link {
+    font-size: 20px;
+    color: #555;
+    margin-left: 20px;
+    text-decoration: none;
+    display: flex; /* Para alinear el icono si es necesario */
+    align-items: center;
+}
+
+.search-container {
+    position: relative; /* Permite posicionar el dropdown relativo a este contenedor */
+    flex-grow: 1; /* Permite que ocupe el espacio disponible */
+    max-width: 500px; /* Limita el ancho del buscador */
+    margin: 0 20px;
 }
 
 .search-bar {
@@ -1333,5 +1361,126 @@ body {
 
     .product-info {
         flex: 1 1 100%; /* La info también ocupa todo el ancho */
+    }
+}
+
+.search-input-wrapper {
+    display: flex;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden; /* Para que el input y el botón se vean como uno */
+}
+
+.search-input {
+    flex-grow: 1; /* Ocupa el espacio restante dentro del wrapper */
+    padding: 8px 10px;
+    border: none;
+    outline: none; /* Quita el contorno al enfocar */
+    font-size: 16px;
+}
+
+.search-input-wrapper .search-btn { /* Estilo específico para el botón de búsqueda dentro del input */
+    background-color: #e0e0e0;
+    padding: 8px 12px;
+    border-left: 1px solid #ccc;
+    font-size: 16px;
+}
+.search-input-wrapper .search-btn:hover {
+    background-color: #d0d0d0;
+}
+
+
+/* ESTILOS DEL DROPDOWN DE RESULTADOS */
+.search-results-dropdown {
+    position: absolute; /* Posiciona el dropdown debajo del input */
+    top: 100%; /* Colócalo justo debajo del 'search-input-wrapper' */
+    left: 0;
+    width: 100%; /* Asegura que el dropdown tenga el mismo ancho que el contenedor de búsqueda */
+    max-height: 300px; /* Altura máxima para hacer scroll si hay muchos resultados */
+    overflow-y: auto; /* Habilita el scroll vertical */
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-top: none; /* Elimina el borde superior para que se "pegue" al input */
+    border-radius: 0 0 5px 5px; /* Bordes redondeados solo abajo */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 999; /* Ligeramente menor que la TopBar, pero por encima de contenido de la página */
+
+    /* POR DEFECTO ESTARÁ OCULTO */
+    display: none;
+    /* Para mostrarlo, añadirías una clase dinámica con React, ej: .search-results-dropdown.show { display: block; } */
+}
+
+.show {
+    position: absolute; /* Posiciona el dropdown debajo del input */
+    top: 100%; /* Colócalo justo debajo del 'search-input-wrapper' */
+    left: 0;
+    width: 100%; /* Asegura que el dropdown tenga el mismo ancho que el contenedor de búsqueda */
+    max-height: 300px; /* Altura máxima para hacer scroll si hay muchos resultados */
+    overflow-y: auto; /* Habilita el scroll vertical */
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-top: none; /* Elimina el borde superior para que se "pegue" al input */
+    border-radius: 0 0 5px 5px; /* Bordes redondeados solo abajo */
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    z-index: 999; /* Ligeramente menor que la TopBar, pero por encima de contenido de la página */
+    display: flow-root;
+}
+/* Estilos para cada item de resultado */
+.search-results-dropdown .search-result-item {
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.search-results-dropdown .search-result-item:last-child {
+    border-bottom: none; /* No hay borde en el último elemento */
+}
+
+.search-results-dropdown .search-result-item:hover {
+    background-color: #f0f0f0;
+}
+
+.search-results-dropdown .search-result-item img {
+    width: 40px;
+    height: 40px;
+    object-fit: cover;
+    margin-right: 10px;
+    border-radius: 3px;
+}
+
+.search-results-dropdown .search-result-item span {
+    font-size: 15px;
+    color: #333;
+    white-space: nowrap; /* Evita que el texto se rompa */
+    overflow: hidden; /* Oculta el texto que se desborda */
+    text-overflow: ellipsis; /* Añade puntos suspensivos */
+}
+
+/* Estilo para mensaje de no resultados (opcional) */
+.search-results-dropdown .no-results {
+    padding: 15px;
+    text-align: center;
+    color: #777;
+    font-style: italic;
+}
+
+/* Media Queries para responsividad (ajusta según necesites) */
+@media (max-width: 768px) {
+    .top-bar {
+        padding: 10px;
+    }
+    .logo {
+        font-size: 20px;
+        margin-left: 10px;
+    }
+    .search-container {
+        margin: 0 10px;
+        max-width: none; /* Permite que ocupe todo el ancho disponible en móviles */
+    }
+    .cart-link, .favorites-link, .account-link {
+        margin-left: 10px;
     }
 }

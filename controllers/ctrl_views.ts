@@ -63,10 +63,14 @@ const productos:vistas_productos= {
     todos: async (c: Context) => {
         try {
             const seccion: string | undefined = c.req.query("section") || undefined;
+            const busqueda: string | undefined = c.req.query("b") || undefined;
+            const filtro: string | undefined = c.req.query("filtro") || undefined;
+            let decodificada = decodeURIComponent(busqueda ?? "");
+            decodificada = "%"+decodificada.split(" ").join("%")+"%";
             const pagina: number = parseInt(c.req.query("p") || "1");
-
-            const productos = await Productos.mostrarTodos(seccion, pagina, 12);
-
+            console.log(`Sección: ${seccion}\nBusqueda: ${decodificada}\nPagina: ${pagina}`)
+            const productos = await Productos.mostrarTodos(decodificada, seccion, filtro, pagina, 12);
+            console.log(productos)
             return c.json(productos)
         } catch (error) {
             return c.json({ estatus: 0, result: {

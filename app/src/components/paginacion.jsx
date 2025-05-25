@@ -19,7 +19,6 @@ function Paginacion({ paginas, location  }){
 
         jsonRequest["p"] = numberOfPage
         
-        console.log(jsonRequest);
         let searchQuery = "";
         for (const element in jsonRequest) {
             if (Object.prototype.hasOwnProperty.call(jsonRequest, element)) {
@@ -37,17 +36,20 @@ function Paginacion({ paginas, location  }){
 
         if(paginas.pagina_actual > intervalButton && paginas.pagina_actual >= (paginas.pagina_maxima - intervalButton)){
             for (let i = paginas.pagina_actual-intervalButton*2; i <= (paginas.pagina_actual); i++) {
-                console.log(i)
-                interval.push(i)
+                interval.push(i); 
             }
         }
         else if(paginas.pagina_actual > intervalButton && paginas.pagina_actual <= (paginas.pagina_maxima - intervalButton)) {
             for (let i = paginas.pagina_actual-intervalButton; i <= (paginas.pagina_actual+intervalButton); i++) {
-                interval.push(i)
+                interval.push(i);
+            }
+        }
+        else if(paginas.pagina_maxima <= showingSpaces){
+            for(let i = 1; i<=paginas.pagina_maxima; i++){
+                interval.push(i);
             }
         }
         else {
-            console.log(" Else  ")
             for(let i = 1; i<=showingSpaces; i++){
                 interval.push(i);
             }

@@ -74,7 +74,7 @@ function DetalleProductos () {
         <h2>Productos Relacionados</h2>
         <div className="product-grid">
           {relacionados.length ? (
-            relacionados.map((e, i) => <ProductCard key = {i} nombre = {e.nombre} precio = {e.precio} sku = {e.sku} imgName={e.imagen}/>)
+            relacionados.map((e, i) => <ProductCard key = {i} nombre = {e.nombre} precio = {e.precio_format} sku = {e.sku} imgName={e.imagen}/>)
           ) : null}
         </div>
       </section>

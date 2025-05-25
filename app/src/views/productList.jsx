@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import { useLocation } from 'react-router-dom'; 
+import { useLocation, useNavigate } from 'react-router-dom'; 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import ProductCard from "../components/presentacion_productos/ProductCard.jsx";
@@ -7,6 +7,7 @@ import Paginacion from "../components/paginacion.jsx"
 
 function CatalogoProductos () {
     let location = useLocation();
+    const navigate = useNavigate();
     const [productList, setProductList] = useState([]);
     const [paginacion, setPaginacion] = useState({});
 
@@ -23,23 +24,47 @@ function CatalogoProductos () {
       }
     }
 
-    useEffect(()=> {
-      const queryParams = new URLSearchParams(location.search);
-      
-      function createQuery (queries) {
-        let final_query = "";
-        queries.forEach(element => {
-          const data = queryParams.get(element)
-          if(data) {
-            if(!final_query.length) final_query += `?${element}=${data}`
-            else final_query += `&${element}=${data}`
-          }
-        });
+    const queryParams = new URLSearchParams(location.search);
+    
+    function createQuery (queries) {
+      let final_query = "";
+      queries.forEach(element => {
+        const data = queryParams.get(element)
+        if(data) {
+          if(!final_query.length) final_query += `?${element}=${data}`
+          else final_query += `&${element}=${data}`
+        }
+      });
 
-        return final_query;
+      return final_query;
+    }
+
+    function addFilter (filter) {
+      const regex = /[?&= ]+/g
+      let jsonRequest = {}
+      let splitted = location.search.split(regex);
+      splitted.shift()
+      
+      for (let i = 0; i < splitted.length; i += 2) {
+        let number = i;
+        console.log(splitted[i]+"= "+splitted[i+1])
+        jsonRequest[splitted[i]] = splitted[i+1];
       }
-      console.log(createQuery(["p", "section"]))
-      getProductList(createQuery(["p", "section"]));
+
+      jsonRequest["filtro"] = filter
+        
+      let searchQuery = "";
+      for (const element in jsonRequest) {
+        if (Object.prototype.hasOwnProperty.call(jsonRequest, element)) {
+          if(searchQuery.length) searchQuery += `&${element}=${jsonRequest[element]}`
+          else searchQuery += `?${element}=${jsonRequest[element]}`
+        }
+      }
+      navigate(`${location.pathname}${searchQuery}`);
+    }
+
+    useEffect(()=> {
+      getProductList(createQuery(["p", "section", "filtro"]));
     }, [location])
 
     return (
@@ -50,16 +75,16 @@ function CatalogoProductos () {
         <section className="filters-and-sort">
           <h3>Ordenar por:</h3>
           <div className="sort-options">
-            <button type="button" className="sort-btn">
-              Precio (Menor a Mayor) <FontAwesomeIcon icon="fa-solid fa-sort-amount-up" />
+            <button type="button" value = {1} className="sort-btn" onClick={(e)=> addFilter (e.target.value)}>
+              Precio (Menor a Mayor) <FontAwesomeIcon icon="fa-solid fa-sort-amount-up"  />
             </button>
-            <button type="button" className="sort-btn">
+            <button type="button" value = {2} className="sort-btn" onClick={(e)=> addFilter (e.target.value)}v>
               Precio (Mayor a Menor) <FontAwesomeIcon icon="fa-solid fa-sort-amount-down" />
             </button>
-            <button type="button" className="sort-btn">
+            <button type="button" value = {3} className="sort-btn" onClick={(e)=> addFilter (e.target.value)}>
               Nombre (A-Z) <FontAwesomeIcon icon="fa-solid fa-sort-alpha-down" />
             </button>
-            <button type="button" className="sort-btn">
+            <button type="button" value = {4} className="sort-btn" onClick={(e)=> addFilter (e.target.value)}>
               Nombre (Z-A) <FontAwesomeIcon icon="fa-solid fa-sort-alpha-up" />
             </button>
           </div>
@@ -68,7 +93,7 @@ function CatalogoProductos () {
         <section className="product-grid-section">
           <div className="product-grid">
             {productList.length ? (
-              productList.map((e, i) => <ProductCard key = {i} nombre = {e.nombre} precio = {e.precio} sku = {e.sku} imgName = {e.imagen}/>)
+              productList.map((e, i) => <ProductCard key = {i} nombre = {e.nombre} precio = {e.precio_format} sku = {e.sku} imgName = {e.imagen}/>)
             ): (<h1>Aun no hay productos pero lo invitamos a que siga con nosotros  proximamente habrá mas productos 😊</h1>)}
           </div>
           {/* <p>No se encontraron productos con los filtros seleccionados.</p>  // Esto se mostraría condicionalmente con estado */}

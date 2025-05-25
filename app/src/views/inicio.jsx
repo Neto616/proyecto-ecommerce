@@ -34,7 +34,7 @@ function Inicio() {
             <section className="product-grid-section">
                 <h2>Productos Destacados</h2>
                 <div className="product-grid">
-                    {destacados.length ? (destacados?.map((e, i) => <ProductCard key={i} nombre={e.nombre} precio={e.precio}  sku = {e.sku} imgName = {e.imagen}/>)) : null}
+                    {destacados.length ? (destacados?.map((e, i) => <ProductCard key={i} nombre={e.nombre} precio={e.precio_format}  sku = {e.sku} imgName = {e.imagen}/>)) : null}
                 </div>
             </section>
         </main>
