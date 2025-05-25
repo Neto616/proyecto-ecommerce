@@ -1,10 +1,27 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom'; 
 import "../style.css"; 
 import ProductCard from "../components/presentacion_productos/ProductCard.jsx";
 
 
 function Inicio() { 
+    const [destacados, setDestacados] = useState([]);
+
+    const getDestacados = async () => {
+        try {
+            const data = await fetch("http://localhost:3001/destacados", {method: "GET"})            ;
+            const resultado = await data.json();
+            console.log("Los objetos destacados son: ", resultado.info.data);
+            setDestacados(resultado.info.data);
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    useEffect(() => {
+        getDestacados();
+    }, [])
+
     return (
         <>
         <main className="main-content">
@@ -17,9 +34,7 @@ function Inicio() {
             <section className="product-grid-section">
                 <h2>Productos Destacados</h2>
                 <div className="product-grid">
-                    <ProductCard/>
-                    <ProductCard/>
-                    <ProductCard/>
+                    {destacados.length ? (destacados?.map((e, i) => <ProductCard key={i} nombre={e.nombre} precio={e.precio}  sku = {e.sku} imgName = {e.imagen}/>)) : null}
                 </div>
             </section>
         </main>
@@ -27,4 +42,4 @@ function Inicio() {
     );
 }
 
-export default Inicio; // Si tu función es Index, deja export default Index;
+export default Inicio;

@@ -71,3 +71,75 @@ code {
         justify-content: center; /* Centra los botones si se apilan */
     }
 }
+
+.pagination-container {
+    display: flex;
+    justify-content: flex-end; /* Alinea a la derecha */
+    align-items: center;
+    margin-top: 40px; /* Espacio por encima de la paginación */
+    padding: 15px 0;
+    width: 100%;
+}
+
+.pagination-btn {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.95em;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espacio entre texto e icono */
+    margin: 0 5px; /* Espacio entre los botones */
+    transition: background-color 0.2s ease-in-out, transform 0.1s ease-in-out;
+}
+
+.pagination-btn:hover {
+    background-color: #0056b3;
+    transform: translateY(-1px);
+}
+
+.pagination-btn.active {
+    background-color: #0056b3; /* Color para el botón de página actual */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+    font-weight: bold;
+}
+
+.page-numbers {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* Espacio entre los números de página */
+}
+
+.page-numbers span {
+    font-size: 1em;
+    color: #555;
+    margin: 0 5px; /* Espacio para los puntos suspensivos */
+}
+
+/* Estilos específicos para los botones Anterior/Siguiente si los quieres distintos */
+.pagination-btn.prev-btn,
+.pagination-btn.next-btn {
+    min-width: 90px; /* Asegura un ancho mínimo para estos botones */
+    justify-content: center;
+}
+
+/* Ajustes para pantallas pequeñas */
+@media (max-width: 600px) {
+    .pagination-container {
+        flex-direction: column; /* Apila los elementos de paginación */
+        align-items: center; /* Centra los elementos apilados */
+        gap: 15px; /* Espacio entre los bloques apilados */
+    }
+
+    .page-numbers {
+        margin: 10px 0; /* Espacio extra si se apilan */
+    }
+
+    .pagination-btn {
+        padding: 10px 12px; /* Ajusta el padding para móviles */
+        font-size: 0.9em;
+    }
+}

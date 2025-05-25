@@ -1,100 +1,81 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
+import { useNavigate, useLocation } from 'react-router-dom';
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ProductCard from "../components/presentacion_productos/ProductCard.jsx";
 
 function DetalleProductos () {
+    const location = useLocation();
+    const [datos, setDatos] = useState({});
+    const [relacionados, setRelacionados] = useState({});
+    const [quantity, setQuantity] = useState(1);
+
+    const navigate = useNavigate();
+
+    const getData = async (pathName) => {
+      try {
+        const result = await fetch(`http://localhost:3001${pathName}`, {method: "GET"});
+        const data = await result.json();
+        if(data.estatus !== 1) return alert("Ha ocurrido un error");
+        console.log("Datos del producto: ", data);
+        
+        setDatos(data.result.data[0]);
+        setRelacionados(data.result.productos_relacionados)
+      } catch (error) {
+        console.log("Ha ocurrido un error: ", error);
+        navigate("/");        
+      }
+    }
+
+    useEffect(()=>{
+      window.scrollTo(0,0);
+      getData(location.pathname);
+    }, [location]);
+
     return (
-        <main class="main-content">
-            <div class="product-detail-container">
-                <div class="product-gallery">
-                    <div class="main-image">
+        <main className="main-content">
+            <div className="product-detail-container">
+                <div className="product-gallery">
+                    <div className="main-image">
                         <img
-                        src="https://pm1.aminoapps.com/7976/5456503b36b384de7f9aede9d3a7dcab14dfd0f1r1-227-222v2_hq.jpg"
-                        alt="Producto Principal"
-                        />
-                    </div>
-                    <div class="thumbnails">
-                        <img
-                        src="https://pm1.aminoapps.com/7976/5456503b36b384de7f9aede9d3a7dcab14dfd0f1r1-227-222v2_hq.jpg"
-                        alt="Vista 1"
-                        class="active"
-                        />
-                        <img
-                        src="https://pm1.aminoapps.com/7976/5456503b36b384de7f9aede9d3a7dcab14dfd0f1r1-227-222v2_hq.jpg"
-                        alt="Vista 2"
-                        />
-                        <img
-                        src="https://pm1.aminoapps.com/7976/5456503b36b384de7f9aede9d3a7dcab14dfd0f1r1-227-222v2_hq.jpg"
-                        alt="Vista 3"
-                        />
-                        <img
-                        src="https://pm1.aminoapps.com/7976/5456503b36b384de7f9aede9d3a7dcab14dfd0f1r1-227-222v2_hq.jpg"
-                        alt="Vista 4"
+                        src={"http://localhost:3001/"+datos.sku+"/"+datos.imagen}
+                        alt={datos.nombre}
                         />
                     </div>
                 </div>
-        <div class="product-info">
-          <h1>Nombre del Producto Increíble y Novedoso</h1>
-          <p class="price">$499.99</p>
-          <p class="description">
-            Este es un producto fantástico con características increíbles.
-            Perfecto para todas tus necesidades, diseñado con los mejores
-            materiales para garantizar durabilidad y rendimiento. Lorem ipsum
-            dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor
-            incididunt ut labore et dolore magna aliqua.
+        <div className="product-info">
+          <h1>{datos.nombre}</h1>
+          <p className="price">${datos.precio_format}</p>
+          <p className="description">
+            {datos.descripcion}
           </p>
 
-          <div class="product-options">
-            <label for="color">Color:</label>
-            <select id="color">
-              <option value="rojo">Rojo</option>
-              <option value="azul">Azul</option>
-              <option value="verde">Verde</option>
-            </select>
-
-            <label for="size">Talla/Tamaño:</label>
-            <select id="size">
-              <option value="s">Pequeño</option>
-              <option value="m">Mediano</option>
-              <option value="l">Grande</option>
-            </select>
-
-            <label for="quantity">Cantidad:</label>
-            <div class="quantity-selector">
-              <button type="button" id="decrement-qty">-</button>
-              <input type="number" id="quantity" value="1" min="1" max="10" />
-              <button type="button" id="increment-qty">+</button>
+          <div className="product-options">
+            <label for="quantity" style= {{textAlign: "left"}}>Cantidad:</label>
+            <div className="quantity-selector">
+              <button type="button" id="decrement-qty" onClick={()=> quantity > 1 ? setQuantity(quantity - 1) : null}>-</button>
+              <input type="number" id="quantity" value={quantity} min="1" max={datos.existencia} readOnly/>
+              <button type="button" id="increment-qty" onClick={()=> quantity < datos.existencia ? setQuantity(quantity + 1) : null}>+</button>
             </div>
           </div>
 
-          <div class="action-buttons">
-            <button type="button" class="btn-primary">
-              <i class="fas fa-shopping-cart"></i> Agregar al Carrito
+          <div className="action-buttons">
+            <button type="button" className="btn-primary">
+              <FontAwesomeIcon icon="fa-shopping-cart"/> Agregar al Carrito
             </button>
-            <button type="button" class="btn-favorite">
-              <i class="far fa-heart"></i> Añadir a Favoritos
+            <button type="button" className="btn-favorite">
+              <FontAwesomeIcon icon="fa-heart"/> Añadir a Favoritos
             </button>
           </div>
 
-          <div class="additional-info">
-            <h3>Características Técnicas</h3>
-            <ul>
-              <li>Material: Plástico ABS de alta resistencia</li>
-              <li>Dimensiones: 10x15x5 cm</li>
-              <li>Peso: 200g</li>
-              <li>Garantía: 1 año</li>
-            </ul>
-            <h3>Opiniones de Clientes</h3>
-            <p>¡Excelente producto, muy satisfecho! - Juan Pérez</p>
-            <p>Lo recomiendo ampliamente. - María García</p>
-          </div>
         </div>
       </div>
 
-      <section class="related-products">
+      <section className="related-products">
         <h2>Productos Relacionados</h2>
-        <div class="product-grid">
-            <ProductCard/>
-            <ProductCard/>
+        <div className="product-grid">
+          {relacionados.length ? (
+            relacionados.map((e, i) => <ProductCard key = {i} nombre = {e.nombre} precio = {e.precio} sku = {e.sku} imgName={e.imagen}/>)
+          ) : null}
         </div>
       </section>
     </main>

@@ -2,20 +2,20 @@ import React from "react";
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-function ProductCard() {
+function ProductCard({ nombre, precio, sku, imgName }) {
     const navigate = useNavigate();
     return (
-        <div className="product-card" onClick={()=> navigate("/detalle")}>
+        <div className="product-card" onClick={()=> navigate(`/detalle/${sku}`)}>
             <img
-            src="https://pm1.aminoapps.com/7976/5456503b36b384de7f9aede9d3a7dcab14dfd0f1r1-227-222v2_hq.jpg"
-            alt="Producto 1"
+            src={"http://localhost:3001/"+sku+"/"+imgName}
+            alt={nombre}
             />
-            <FontAwesomeIcon icon="fas fa-heart" className="favorite-icon"/>
+            <FontAwesomeIcon icon="fa-heart" className="favorite-icon"/>
             <div className="product-card-info" >
-                <h3>Nombre del Producto Ejemplo Largo</h3>
-                <p className="price">$299.99</p>
+                <h3>{nombre}</h3>
+                <p className="price">${precio}</p>
                 <button type="button" className="add-to-cart-btn">
-                    <FontAwesomeIcon icon="fas fa-shopping-cart" /> Agregar
+                    <FontAwesomeIcon icon="fa-shopping-cart" /> Agregar
                 </button>
             </div>
         </div>

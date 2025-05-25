@@ -336,7 +336,7 @@ body {
 
 .product-gallery .main-image img {
     max-width: 100%;
-    height: auto;
+    height: 500px;
     border-radius: 8px;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
 }
@@ -1303,5 +1303,35 @@ body {
 
     .account-content {
         padding-left: 0;
+    }
+}
+
+/* Para pantallas medianas (tabletas) y más grandes */
+@media (min-width: 769px) {
+    .product-gallery {
+        flex: 1 1 60%; /* Ocupa un 60% del espacio disponible */
+        max-width: 600px; /* O un valor que consideres adecuado */
+        display: flex; /* Asegúrate de que sea flex para centrar la imagen si es necesario */
+        flex-direction: column;
+        align-items: center; /* Centra la imagen si no ocupa todo el ancho */
+    }
+
+    .product-info {
+        flex: 1 1 40%; /* El resto para la información */
+    }
+}
+
+/* Para pantallas más pequeñas (móviles) */
+@media (max-width: 768px) {
+    .product-gallery {
+        flex: 1 1 100%; /* Ocupa todo el ancho en móviles */
+        max-width: none;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .product-info {
+        flex: 1 1 100%; /* La info también ocupa todo el ancho */
     }
 }
