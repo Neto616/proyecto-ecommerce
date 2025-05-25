@@ -4,6 +4,7 @@ import { Hono, Context } from 'hono';
 import { deleteCookie } from 'hono/cookie'
 //Importamos los modulos que hemos creado
 import { usuarios, productos }from '../controllers/ctrl_views.ts';
+import { categorias } from "../controllers/ctrl_controllers.ts";
 //Inicializamos nuestro objeto de tipo Hono
 const route: Hono = new Hono()
 //Creamos y nombramos las rutas que se van a utilizar en el API
@@ -13,6 +14,11 @@ const route: Hono = new Hono()
 //Estas rutas cargaran una de las vistas del E-commerce
 route.get("/", usuarios.inicio);
 route.get("/productos", productos.todos);
+route.get("/destacados", productos.destacados);
+//Ruta para obtener los productos destacados
+route.get("/productos_destacados", productos.todos);
+//Ruta para obtener las categorias
+route.get("/categoria", categorias.getCategoria);
 
 //Estas rutas traen información en un JSON
 route.get("/user_exist", usuarios.existe); //Ruta que avisa si el usuario existe o no para saber donde redirigirlo

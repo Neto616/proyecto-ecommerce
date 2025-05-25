@@ -3,10 +3,11 @@ import { cors } from "https://deno.land/x/hono@v4.1.6/middleware.ts"
 // Importamos las rutas
 import { default as vista } from './routes/rt_views.ts';
 import { default as controllers } from './routes/rt_controllers.ts';
-
+import { serveStatic } from "https://deno.land/x/hono@v4.1.6/middleware.ts";
 const app = new Hono();
 
 app.use(cors());
+app.use("*", serveStatic({ root: "./images" }));
 
 // Definimos las rutas
 app.route('/', vista);

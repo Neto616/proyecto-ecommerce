@@ -46,15 +46,28 @@ const usuarios:vistas_usuarios= {
 }
 
 const productos:vistas_productos= {
+    destacados: async (c: Context) => {
+      try {
+        const service = await Productos.productosDestacados();
+        console.log(service);
+        return c.json(service);     
+      } catch (error) {
+        console.log(error);
+        return c.json({ estatus: 0, info: {
+            message: "Ha ocurrido un error",
+            error: error
+        }});
+      }  
+    },
     //Llama y carga la vista de todos los productos que se tengan en al base de datos
     todos: async (c: Context) => {
         try {
-            const productos = await Productos.mostrarTodos();
+            const seccion: string | undefined = c.req.query("section") || undefined;
+            const pagina: number = parseInt(c.req.query("p") || "1");
 
-            return c.json({ estatus: 1, 
-                result: {
-                    info: "Todos los productos", data: { productos }
-                }})
+            const productos = await Productos.mostrarTodos(seccion, pagina, 12);
+
+            return c.json(productos)
         } catch (error) {
             return c.json({ estatus: 0, result: {
                 info: "Error",
@@ -67,10 +80,7 @@ const productos:vistas_productos= {
         try {
             const producto = c.req.param("producto");
             const detalles = await Productos.detalle(producto);
-            return c.json({ estatus: 1, 
-                result: {
-                    info: "Detalle del producto", data: {producto: producto, detalles}
-                }})
+            return c.json(detalles)
         } catch (error) {
             return c.json({ estatus: 0, result: {
                 info: "Error",
@@ -78,6 +88,7 @@ const productos:vistas_productos= {
             }})
         }
     },
+    //Trae los productos que estan marcados como favoritos
     favoritos: async (c: Context) => {
         try {
             const { p } = c.req.query();

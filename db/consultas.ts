@@ -170,14 +170,31 @@ class Productos extends Consultas{
         }
     }
     //Metodo estatico asincorno que trae el listado de los produtos
-    public static async mostrarTodos(){
+    public static async mostrarTodos(section: string | undefined, offset: number, limit: number = 10){
         try {
             const conectar = new Productos();
             if(!conectar.db) await conectar.initDB(); //Conectamos a base de datos
             //Nos quedamos unicamente con los resultados de la consulta que tengamos
-            const { rows } = await conectar.db.execute("select * from productos;");
+            const totalProducts = await conectar.db.execute(`
+                select 
+                    count(*) as total
+                from productos
+                where estatus = 1 ${section ? "and categoria = ?" : ""}`, [section])
+
+            const pagina = (offset - 1) * limit;
+            let paginaMax: number; 
+            if(totalProducts && totalProducts.rows && totalProducts.rows.length > 0) paginaMax = Math.ceil(totalProducts.rows[0].total/limit);
+            else paginaMax = Math.ceil(1/limit);
+
+            const { rows } = await conectar.db.execute(`
+                select 
+                    * 
+                from productos
+                where estatus = 1 ${section ? "and categoria = ?" : ""}
+                order by id desc
+                limit ? offset ?;`, [section ?? limit, section ? limit : pagina, pagina]);
             //Retonramos un estado 1 y el listado de cada uno de los productos que se tengan en base de datos
-            return {estatus: 1, result: {info: "Listado de productos", data: rows}};
+            return {estatus: 1, result: {info: "Listado de productos", data: rows, pagina_actual: offset, pagina_maxima: paginaMax, limite: limit }};
         } catch (error) {
             //En caso de algun error se imprimira en pantalla  el error
             console.log(error);
@@ -192,14 +209,43 @@ class Productos extends Consultas{
             if(!conectar.db) await conectar.initDB();
 
             const { rows } = await conectar.db.execute(
-                "select * from productos where nombre like ? and estatus = 1",
+                "select *, FORMAT(precio, 2) as precio_format from productos where sku like ? and estatus = 1",
                 [producto]);
 
+            const productos_relacionados = await conectar.db.execute(
+                "select *, FORMAT(precio, 2) as precio_format from productos where categoria = ? and sku not like ? and estatus = 1 limit 4",
+                [rows[0].categoria, rows[0].sku])
+
             console.log("Detalle del producto", rows);
-            return {estatus: 1, result: {info: "Detalle de producto", data: rows}};
+            return {estatus: 1, result: {info: "Detalle de producto", data: rows, productos_relacionados: productos_relacionados.rows}};
         } catch (error) {
             console.log(error);
             return {estatus: 0, result: {info: error}};
+        }
+    }
+    //Metodo que trae los productos destacados (Los primeros cuatro)
+    public static async productosDestacados() {
+        try {
+            const conectar = new Productos();
+            if(!conectar.db) await conectar.initDB();
+
+            const { rows } = await conectar.db.execute( `select * from productos limit 4` );
+
+            return {
+                estatus: 1,
+                info: {
+                    message: "Se han traido los datos",
+                    data: rows || []
+                }
+            };
+        } catch (error) {
+            return {
+                estatus: 0,
+                info:  {
+                    message: "Ha ocurrido un error",
+                    error: error
+                }
+            };
         }
     }
 }
@@ -568,10 +614,38 @@ class Favoritos extends Consultas {
     };
 }
 
+class Categorias extends Consultas {
+    constructor(){ super() }
+
+    public async getCategorias(){
+        try {
+            if(!this.db) await this.initDB();
+            const { rows } = await this.db.execute(`select * from categorias where estatus = 1`);
+            
+            return {
+                estatus: 1,
+                info: {
+                    message: "Se han traido los datos",
+                    data: rows || []
+                }
+            }
+        } catch (error) {
+            console.error(error);
+            return {
+                estatus: 0,
+                info: {
+                    message: "Ha ocurrido un error: "+error
+                }
+            }
+        }
+    }
+}
+
 //Se exportan cada uno de los objetos creados en la parte superior y asi poder utilizarlos en otros archivos
 export { 
     Usuarios, 
     Productos,
     Carrito,
-    Favoritos
+    Favoritos,
+    Categorias,
 };

@@ -27,11 +27,11 @@ abstract class Consultas {
         export: true,  // Exporta las variables al entorno de Deno
       });
 
-      const hostname = env.HOST;
-      const username = env.USR;
-      const database = env.DB;
-      const password = env.PASS;
-      const port = env.PORT;
+      const hostname = env.HOST || "localhost";
+      const username = env.USR || "root";
+      const database = env.DB || "ecommerce";
+      const password = env.PASS || "Neto_616";
+      const port = env.PORT || "3306";
 
       if (!hostname || !username || !database || !password) {
         throw new Error(

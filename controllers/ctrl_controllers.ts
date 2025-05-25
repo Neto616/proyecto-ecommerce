@@ -4,7 +4,7 @@ import { Context } from "hono";
 import { getCookie, setCookie} from 'hono/cookie'
 //Importamos los modulos que generamos de nuestor proyecto
 import { controladores_usuario } from "../types/tipos_rutas.ts";
-import {Favoritos, Usuarios} from '../db/consultas.ts';
+import {Categorias, Favoritos, Usuarios} from '../db/consultas.ts';
 import { controladores_favoritos } from '../types/tipos_rutas.ts';
 
 //Generamos nuestra constante que sera un JSON del tipo asignado con las funciones necesarias para 
@@ -117,7 +117,22 @@ const favorites_abc: controladores_favoritos = {
     },
 }
 
+const categorias = {
+    getCategoria: async (c: Context) => {
+        try {
+            const categoria: Categorias = new Categorias();
+            const resultado = await categoria.getCategorias();
+            // console.log("Categorias: ", resultado)
+            return c.json(resultado);
+        } catch (error) {
+            console.error(error);
+            return c.json({ estatus: 0, result: {info: "Hubo un error", error: error}});
+        }
+    }
+}
+
 export { 
     usuarios_abc, 
-    favorites_abc
+    favorites_abc,
+    categorias
 }

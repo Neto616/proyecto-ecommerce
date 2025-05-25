@@ -10,6 +10,7 @@ export type vistas_usuarios = {
 
 export type vistas_productos = {
     todos: (c:Context) => Promise<Response>,
+    destacados: (c:Context) => Promise<Response>,
     detalle: (c:Context) => Promise<Response>,
     favoritos: (c:Context) => Promise<Response>,
 };
