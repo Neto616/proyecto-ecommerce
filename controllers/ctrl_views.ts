@@ -4,15 +4,21 @@ import { Context } from "hono";
 import { Favoritos, Usuarios } from "../db/consultas.ts";
 import { vistas_productos, vistas_usuarios } from "../types/tipos_rutas.ts";
 import { Productos } from "../db/consultas.ts";
+import { getCookie } from 'hono/cookie';
 
 //Generamos un objeto JSON que dentro tendrán funciones anonimas y estas son las acciones que se realizarán con los usuarios
 const usuarios:vistas_usuarios= {
     //Tendremos una funcion de inicio
     inicio: async (c: Context) => {
-        return c.json({ estatus: 1 , 
-            result: { 
-                info: "Bienvenido", data: {}
-            }})
+        try {
+            const filePath = "../index.html";
+            const htmlContent = await Deno.readTextFile(filePath);
+            console.log("Cargando html")
+            return c.html(htmlContent);
+        } catch (error) {
+            console.error("Ha sucedido un error al cargar la vista: ", error);
+            c.json({ estatus: 0 })
+        }
     },
     //La función se llama existe que llama a nueustro objeto usuario y verifica que el usuari exista en base a su correo
     existe: async (c:Context) => {
@@ -120,5 +126,24 @@ const productos:vistas_productos= {
         }
     }
 }
+
+const favoritos = {
+    getFavs: async (c:Context) => {
+        try {
+            const session = JSON.parse(getCookie(c, 'usuario_cookie') || JSON.stringify({})); //Obtenemos la sesión del usuario para saber a quien le pertenece la cuenta
+            const pagina: number = parseInt(c.req.query("p") || "1");
+            console.log(session)
+            const favoritos: Favoritos = new Favoritos(session.id);
+            const resultados = await favoritos.favorites(pagina, 12);
+            return c.json(resultados);
+        } catch (error) {
+            console.log(error);
+            return c.json({ estatus: 0, result: {
+                info: "Ha ocurrido un error",
+                data: []
+            }})
+        }
+    }
+}
 //Exportamos nuestros dos objetos que se usaran en las rutas
-export {usuarios, productos}
+export {usuarios, productos, favoritos}

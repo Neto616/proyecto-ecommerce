@@ -14,7 +14,7 @@ const usuarios_abc: controladores_usuario = {
     crear: async (c: Context) => {
         //Obtenemos los datos que queremos unicamente obtener que sera:
         //nombre, apellidos, correo, contraseña del body de la peticion que tengamos.
-        const {nombre, apellidos, correo, contrasena} = await c.req.parseBody();
+        const {nombre, apellidos, correo, contrasena} = await c.req.json();
         //Generamos una constante de tipo usuario y le pasamos cada uno de los datos necesarios
         //para poder ser inicializado
         const consulta: Usuarios = new Usuarios(
@@ -26,7 +26,7 @@ const usuarios_abc: controladores_usuario = {
         //Una vez inicializamos nuestro objeto llamamos a su metodo para crear un usuario en la bd
         const bd_response = await consulta.crearUsuario();
         //retornamos tambien un JSON con un estatus que se ocupara al momento de realizar las peticiones por al api
-        return c.json({ estatus: 1, result: {info: "Crear usuario", result: {db_response: bd_response}}});
+        return c.json(bd_response);
     },
     //Funcion encargada de actualizar los datos del usuario
     actualizar: async (c: Context) => {
@@ -67,10 +67,11 @@ const usuarios_abc: controladores_usuario = {
     iniciar_sesion: async (c: Context) => {
         try {
             //Del body unicamente obtenemos los datos correo y contraseña
-            const {correo, contrasena} = await c.req.parseBody();
+            const {correo, contrasena} = await c.req.json();
             //Obtenemos el resultado de lo que nos entregue al el metodo iniciarSesion del objeto Usuarios donde en los paremotros
             //ponemos que si correo no es nulo que se ponga un string vacio y lo mismo con contrasena
             const { result } = (await Usuarios.iniciarSesion(correo?.toString() || "", contrasena?.toString() || "")).result;
+            console.log(result);
             //En caso de que result tenga longitud 0 se retornara un estado para que se maneja desde el front la vista que se mostrara
             if(!result.length) return c.json({
                 estatus: 2, 
@@ -81,7 +82,7 @@ const usuarios_abc: controladores_usuario = {
             const usuario_nombre: string = (result[0].nombre+" "+result[0].apellidos);
             //Creamos una cookie con nombre usuario_cooki y en su valor le damos el identificador y el nombre
             //Tambien mencionamos que esta cookie se podra usar en todas las rutas
-            setCookie(c, 'usuario_cookie', JSON.stringify({id: result[0].id, nombre: usuario_nombre}), {path: "/"});
+            setCookie(c, 'usuario_cookie', JSON.stringify({id: result[0].id, nombre: usuario_nombre}), {path: "/", maxAge: 3600, httpOnly: true, secure: false, sameSite: "Lax"});
             //retornamos un json con la respuesta para que en front se pueda manejar
             return c.json({
                 estatus: 1, 
@@ -102,17 +103,20 @@ const favorites_abc: controladores_favoritos = {
         try {
             const { producto } = await c.req.json(); //Obtenemos del JSON que nos llega el atributo producto de manera especifica
             const productoID = parseInt(producto || "0"); //Obtenemos el identificador de nuestro producto
-            const session = JSON.parse(getCookie(c, 'usuario_cookie') || "{id: 0}"); //Obtenemos la sesión del usuario para saber a quien le pertenece la cuenta
+            const session = JSON.parse(getCookie(c, 'usuario_cookie') || JSON.stringify({id: 2})); //Obtenemos la sesión del usuario para saber a quien le pertenece la cuenta
 
             const favorito: Favoritos = new Favoritos(session.id); //Dentro de este objeto pondremos el identificador del usuario que se traera en base a la cookie que se tenga guardada
-            const resultado = favorito.decideAction(productoID); //Decidimos si el producto se va a marcar como favorito o se va a desmarcar de la lista de favoritos
+            const resultado = await favorito.decideAction(productoID); //Decidimos si el producto se va a marcar como favorito o se va a desmarcar de la lista de favoritos
             //Retornamos el valor que nos devuelva nuestro metodo
             return c.json( resultado );
         } catch (error) {
             //En caso de error imprimimos el error en consola
             console.log(error);
             //Retonramos un estado de cero para mencionar que ha ocurrido un error
-            return c.json({ estatus: 0 })
+            return c.json({ estatus: 0, result: {
+                info: "Ha ocurrido un error",
+                data: []
+            }})
         }
     },
 }

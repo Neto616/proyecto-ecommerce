@@ -7,7 +7,7 @@ function SideBar({ isOpen, onClose }){
 
   const fetchCategoria = async () => {
     try {
-      const resultado = await fetch("http://localhost:3001/categoria", {method: "GET"});
+      const resultado = await fetch("http://localhost:3001/api/categoria", {method: "GET"});
       const data = await resultado.json();
       setCategorias(data.info);
     } catch (error) {

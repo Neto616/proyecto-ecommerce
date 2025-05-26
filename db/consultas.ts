@@ -29,10 +29,10 @@ class Usuarios extends Consultas{
                 "call alta_usuarios(?, ?, ?, ?, ?)",
                 [this.nombre, this.apellidos, (this?.whatsapp || ''), this.correo, this.contrasena])
             //Retornamos un estado y los resultados de la consulta
-            return {estatus: 1, result: rows}
+            return {estatus: 1, result:{info: "Se ha creado el usuario de manera exitosa", data: rows || []}}
         } catch (error) {
             console.log("Paso un error: ", error)
-            return {estatus:0, result: {info: error}}
+            return {estatus:0, result: {info: error, data: []}}
         }
     }
     //Metodo asincrono que nos permite actualizar los datos del usuario que recibe un identificador
@@ -140,6 +140,64 @@ class Usuarios extends Consultas{
             return {estatus: 0, result: {info: error}};
         }
     }
+}
+//Creamos una clase que se encargue uniacmente de cargar la información del usuario de manera efectiva
+class UsuarioService extends Consultas {
+    constructor(private id: number){ super() }
+    //Getter para manipulación futura del id de manera interna
+    public getId (): number {
+        return this.id;
+    }
+    //Metodo para obtener los datos generales del usuario (nombre, apellido, correo, wpp)
+    public async getInfo() {
+        try {
+            if(!this.db) await this.initDB();
+
+            const { rows } = await this.db.execute(`
+                select
+                    *
+                from usuarios
+                where id = ?
+            `, [this.getId()]);
+
+            return { estatus: 1, result: {
+                info: "Los datos del usuario son",
+                data: rows || []
+            }}
+        } catch (error) {
+            console.log("Ha ocurrido obteniendo la información del usuario: ", error);
+            return { estatus: 0, result: {
+                info: "Ha ocurrido un error",
+                data: []
+            }}
+        }
+    }
+    //Metodo para traer los datos que se encargaran en mi cuenta
+    public async getDirections() {
+        try {
+            if (!this.db) await this.initDB();
+
+            const { rows } = await this.db.execute(`
+                select 
+                    u.*,
+                    d.*
+                from usuarios u
+                inner join direcciones d on u.id = d.usuario
+                where u.id = ?`, [this.getId()]);
+
+            return {estatus: 1, result: {
+                info: "Las direcciones del usuario",
+                data: rows || []
+            }}
+        } catch (error) {
+            console.log(error);
+            return {estatus: 0, result: {
+                info: "No se puede obtener información sobre este usuario",
+                data: []
+            }}
+        }
+    }
+    //Metodo para obtener los pedidos que ha realizado el usuario
 }
 //Creamos nuestra clase producto que hereda de consultas para poder realizar la conexión a la base de datos.
 class Productos extends Consultas{
@@ -421,6 +479,21 @@ class Favoritos extends Consultas {
         try {
             //Verificamos la conexion y en caso de no haber realizamos nuestra conexion a la base de datos
             if(!this.db) await this.initDB();
+            const totalProducts = await this.db.execute(`
+                select 
+                     p.sku as sku,
+                     p.nombre as nombre,
+                     format(p.precio, 2) as precio,
+                     p.imagen as imagen,
+                     p.existencia as existencia
+                    from productos_favoritos pf
+                    inner join usuarios u on u.id = pf.usuario
+                    inner join productos p on p.id = pf.producto
+                    where pf.usuario = ?
+                    order by p.sku;`, [this.getUsuarioId()]);
+            let paginaMax: number;
+            if(totalProducts && totalProducts.rows && totalProducts.rows.length > 0) paginaMax = Math.ceil(totalProducts.rows[0].total/cantidad);
+            else paginaMax = Math.ceil(1/cantidad);
             //Creamos nuestras constantes numericas para obtener:
             //Limite de los productos a mostrar por paginas
             const limit: number = cantidad;
@@ -430,6 +503,7 @@ class Favoritos extends Consultas {
             const { rows } = await this.db.execute(
                 `
                     select 
+                     p.id as id,
                      p.sku as sku,
                      p.nombre as nombre,
                      format(p.precio, 2) as precio,
@@ -452,8 +526,9 @@ class Favoritos extends Consultas {
                     message: "Listado de los productos favoritos del usuario",
                     data: {
                         productos: rows || [],
-                        pagina: pagina,
-                        cantidad: cantidad,
+                        pagina_actual: pagina,
+                        pagina_maxima: paginaMax,
+                        limite: cantidad,
                         cantidadFavoritos: await this.countFavs()
                     }
                 }
@@ -469,7 +544,8 @@ class Favoritos extends Consultas {
                     data: {
                         productos: [],
                         pagina: pagina,
-                        cantidad: cantidad,
+                        pagina_maxima: pagina,
+                        limite: cantidad,
                         cantidadFavoritos: 0
                     }
                 }

@@ -11,7 +11,7 @@ function TopBar({ onBurgerClick }){
     const getResults = async () => {
         try {
             console.log("Busqueda desde el getResults: ",busqueda)
-            const resultado = await fetch(`http://localhost:3001/productos?b=${busqueda}`, {method: "GET"});
+            const resultado = await fetch(`http://localhost:3001/api/productos?b=${busqueda}`, {method: "GET"});
             const data = await resultado.json();
 
             console.log(data)
@@ -52,7 +52,7 @@ function TopBar({ onBurgerClick }){
                             navigate(`/detalle/${e.sku}`)
                             setBusqueda("");
                         }}
-                        className="search-result-item" key={i}><img src={`http://localhost:3001/${e.sku}/${e.imagen}`} alt={e.nombre} /><span>{e.nombre}</span></div>
+                        className="search-result-item" key={i}><img src={`http://localhost:3001/images/${e.sku}/${e.imagen}`} alt={e.nombre} /><span>{e.nombre}</span></div>
                     })) : null}
         </div>
             </div>

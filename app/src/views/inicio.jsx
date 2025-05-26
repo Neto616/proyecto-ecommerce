@@ -9,7 +9,7 @@ function Inicio() {
 
     const getDestacados = async () => {
         try {
-            const data = await fetch("http://localhost:3001/destacados", {method: "GET"})            ;
+            const data = await fetch("http://localhost:3001/api/destacados", {method: "GET"})            ;
             const resultado = await data.json();
             console.log("Los objetos destacados son: ", resultado.info.data);
             setDestacados(resultado.info.data);
@@ -34,7 +34,7 @@ function Inicio() {
             <section className="product-grid-section">
                 <h2>Productos Destacados</h2>
                 <div className="product-grid">
-                    {destacados.length ? (destacados?.map((e, i) => <ProductCard key={i} nombre={e.nombre} precio={e.precio_format}  sku = {e.sku} imgName = {e.imagen}/>)) : null}
+                    {destacados.length ? (destacados?.map((e, i) => <ProductCard key={i} productId={e.id} nombre={e.nombre} precio={e.precio_format}  sku = {e.sku} imgName = {e.imagen} isFav={""} />)) : null}
                 </div>
             </section>
         </main>

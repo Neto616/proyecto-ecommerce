@@ -13,7 +13,7 @@ function CatalogoProductos () {
 
     const getProductList = async (queryParam) => {
       try {
-        const resultado = await fetch(`http://localhost:3001/productos${queryParam}`, {method: "GET"});
+        const resultado = await fetch(`http://localhost:3001/api/productos${queryParam}`, {method: "GET"});
         const data = await resultado.json();
         console.log(data)
         if(data.estatus !== 1) return alert("Something is wrong");
@@ -93,7 +93,7 @@ function CatalogoProductos () {
         <section className="product-grid-section">
           <div className="product-grid">
             {productList.length ? (
-              productList.map((e, i) => <ProductCard key = {i} nombre = {e.nombre} precio = {e.precio_format} sku = {e.sku} imgName = {e.imagen}/>)
+              productList.map((e, i) => <ProductCard key = {i} productId = {e.id} nombre = {e.nombre} precio = {e.precio_format} sku = {e.sku} imgName = {e.imagen} isFav={""}/>)
             ): (<h1>Aun no hay productos pero lo invitamos a que siga con nosotros  proximamente habrá mas productos 😊</h1>)}
           </div>
           {/* <p>No se encontraron productos con los filtros seleccionados.</p>  // Esto se mostraría condicionalmente con estado */}

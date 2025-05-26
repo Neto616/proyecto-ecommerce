@@ -7,11 +7,23 @@ import { serveStatic } from "https://deno.land/x/hono@v4.1.6/middleware.ts";
 const app = new Hono();
 
 app.use(cors());
-app.use("*", serveStatic({ root: "./images" }));
 
 // Definimos las rutas
-app.route('/', vista);
-app.route('/', controllers);
+app.route('/api/', vista);
+app.route('/api/', controllers);
+app.use("/images/*", serveStatic({ root: "./images", rewriteRequestPath: (path) => path.replace("/images", "") }));
+app.use(
+  '*', // Aplica este middleware a todas las rutas
+  serveStatic({
+    root: "./app/build", // La raíz donde está tu app de React compilada
+    rewriteRequestPath: (path) => {
+        if (path.includes('.')) {
+            return path;
+        }
+        return '/index.html';
+    },
+  })
+);
 
 // Ruta para recursos no encontrados
 app.get('/*', (c: Context): Response => {

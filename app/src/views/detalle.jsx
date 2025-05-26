@@ -13,7 +13,7 @@ function DetalleProductos () {
 
     const getData = async (pathName) => {
       try {
-        const result = await fetch(`http://localhost:3001${pathName}`, {method: "GET"});
+        const result = await fetch(`http://localhost:3001/api${pathName}`, {method: "GET"});
         const data = await result.json();
         if(data.estatus !== 1) return alert("Ha ocurrido un error");
         console.log("Datos del producto: ", data);
@@ -37,7 +37,7 @@ function DetalleProductos () {
                 <div className="product-gallery">
                     <div className="main-image">
                         <img
-                        src={"http://localhost:3001/"+datos.sku+"/"+datos.imagen}
+                        src={"http://localhost:3001/images/"+datos.sku+"/"+datos.imagen}
                         alt={datos.nombre}
                         />
                     </div>
@@ -74,7 +74,7 @@ function DetalleProductos () {
         <h2>Productos Relacionados</h2>
         <div className="product-grid">
           {relacionados.length ? (
-            relacionados.map((e, i) => <ProductCard key = {i} nombre = {e.nombre} precio = {e.precio_format} sku = {e.sku} imgName={e.imagen}/>)
+            relacionados.map((e, i) => <ProductCard key = {i} productId = {e.id} nombre = {e.nombre} precio = {e.precio_format} sku = {e.sku} imgName={e.imagen} isFav = {""}/>)
           ) : null}
         </div>
       </section>

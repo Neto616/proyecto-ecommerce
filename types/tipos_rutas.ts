@@ -3,7 +3,7 @@ import { Context } from 'hono';
 // Dentro generamos los tipos de rutas que existen dentro de la API
 // y definimos su nombre y lo que nos retornara dicha ruta
 export type vistas_usuarios = {
-    inicio: (c:Context) => Promise<Response>,
+    inicio: (c:Context) => Promise<any>,
     existe: (c:Context) => Promise<Response>,
     iniciar_sesion: (c:Context) => Promise<Response>
 };

@@ -1484,3 +1484,165 @@ body {
         margin-left: 10px;
     }
 }
+
+.main-content {
+    flex-grow: 1; /* Permite que el contenido principal ocupe espacio si hay sidebars */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Estilos específicos para la página de registro */
+.registro-page {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: calc(100vh - 60px); /* Ajusta si tienes un header fijo */
+    width: 100%;
+}
+
+.registro-container {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    width: 100%;
+    max-width: 450px; /* Ancho máximo del formulario */
+    text-align: center;
+}
+
+.registro-container h2 {
+    margin-bottom: 25px;
+    color: #333;
+    font-size: 28px;
+}
+
+.registro-form .form-group {
+    margin-bottom: 20px;
+    text-align: left;
+    position: relative; /* Importante para que el icono se posicione en relación a este grupo */
+}
+
+.registro-form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: bold;
+    color: #555;
+}
+
+/* NUEVO: Contenedor para el input y el icono */
+.input-with-icon {
+    position: relative; /* Establece un contexto de posicionamiento para el icono */
+    display: block; /* Asegura que ocupe todo el ancho disponible */
+}
+
+.registro-form input[type="text"],
+.registro-form input[type="email"],
+.registro-form input[type="password"] {
+    width: 100%;
+    padding: 12px 12px 12px 40px; /* Aumenta el padding-left para dejar espacio al icono */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.registro-form input[type="text"]:focus,
+.registro-form input[type="email"]:focus,
+.registro-form input[type="password"]:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.25);
+}
+
+/* NUEVO: Estilos para el icono dentro del input */
+.input-with-icon .input-icon {
+    position: absolute; /* Posiciona el icono de forma absoluta */
+    left: 15px; /* Ajusta la distancia desde el borde izquierdo del input */
+    top: 50%; /* Centra verticalmente el icono */
+    transform: translateY(-50%); /* Ajuste fino para centrado vertical perfecto */
+    color: #aaa; /* Color del icono */
+    font-size: 18px; /* Tamaño del icono */
+    pointer-events: none; /* Asegura que el clic en el icono pase al input de abajo */
+}
+
+
+/* Estilos para los mensajes de error y éxito (comentados si no hay lógica para mostrarlos) */
+.error-text {
+    color: #dc3545; /* Rojo de error */
+    font-size: 14px;
+    margin-top: 5px;
+    display: block; /* Para que ocupe su propia línea */
+}
+
+.input-error {
+    border-color: #dc3545 !important; /* Borde rojo para inputs con error */
+}
+
+.success-message {
+    color: #28a745; /* Verde de éxito */
+    font-size: 16px;
+    margin-bottom: 15px;
+    background-color: #e6ffed;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+.error-message {
+    color: #dc3545;
+    font-size: 16px;
+    margin-bottom: 15px;
+    background-color: #ffe6e6;
+    padding: 10px;
+    border-radius: 5px;
+}
+
+/* Botón principal (puedes reutilizar tu .btn-primary) */
+.btn-primary {
+    background-color: #007bff; /* Color azul primario */
+    color: #fff;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    width: 100%; /* Ocupa todo el ancho */
+    margin-top: 20px;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3; /* Azul más oscuro al pasar el ratón */
+}
+
+/* Enlace a la página de inicio de sesión */
+.login-link {
+    margin-top: 25px;
+    font-size: 16px;
+    color: #666;
+}
+
+.login-link a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.login-link a:hover {
+    text-decoration: underline;
+}
+
+/* Si decides usar iconos dentro de los inputs */
+/*
+.form-group {
+    position: relative;
+}
+
+.input-icon {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #aaa;
+}
+*/

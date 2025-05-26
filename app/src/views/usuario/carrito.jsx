@@ -1,6 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
-import ProductItem from "../components/presentacion_productos/ProductItem.jsx";
+import ProductItem from "../../components/presentacion_productos/ProductItem.jsx";
 
 function Carrito () {
     return (
