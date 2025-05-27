@@ -1,7 +1,7 @@
 //Importamos las paqueterias necesarias
 import { Hono } from "hono";
 import { favorites_abc, usuarios_abc   } from "../controllers/ctrl_controllers.ts";
-import { isCorreo } from "../middlewares/general.ts";
+import { hasSession, isCorreo } from "../middlewares/general.ts";
 import { hasEmptys as crearHasEmpty, passwordsEquals } from "../middlewares/usuarios/crearMdw.ts";
 import { hasEmptys as loginHasEmpty } from "../middlewares/usuarios/loginMdw.ts";
 //Inicializamos nuestro objeto Hono
@@ -16,7 +16,7 @@ route.post("/iniciar-sesion", loginHasEmpty, isCorreo, usuarios_abc.iniciar_sesi
 route.delete("/eliminar-usuario", usuarios_abc.eliminar);
 
 //Rutas que tengan que ver con las acciones para los productos favoritos
-route.post("/add_fav", favorites_abc.decideAction); //Ruta para marcar un producto comno favorito o no
+route.post("/add_fav", hasSession, favorites_abc.decideAction); //Ruta para marcar un producto comno favorito o no
 
 //exportamos las rutas que estamos creando
 export default route

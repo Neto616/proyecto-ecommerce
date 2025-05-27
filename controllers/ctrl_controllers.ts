@@ -3,8 +3,8 @@
 import { Context } from "hono";
 import { getCookie, setCookie} from 'hono/cookie'
 //Importamos los modulos que generamos de nuestor proyecto
-import { controladores_usuario } from "../types/tipos_rutas.ts";
-import {Categorias, Favoritos, Usuarios} from '../db/consultas.ts';
+import { controladores_carrito, controladores_usuario } from "../types/tipos_rutas.ts";
+import {Carrito, Categorias, Favoritos, Usuarios} from '../db/consultas.ts';
 import { controladores_favoritos } from '../types/tipos_rutas.ts';
 
 //Generamos nuestra constante que sera un JSON del tipo asignado con las funciones necesarias para 
@@ -103,8 +103,7 @@ const favorites_abc: controladores_favoritos = {
         try {
             const { producto } = await c.req.json(); //Obtenemos del JSON que nos llega el atributo producto de manera especifica
             const productoID = parseInt(producto || "0"); //Obtenemos el identificador de nuestro producto
-            const session = JSON.parse(getCookie(c, 'usuario_cookie') || JSON.stringify({id: 2})); //Obtenemos la sesión del usuario para saber a quien le pertenece la cuenta
-
+            const session = JSON.parse(getCookie(c, 'usuario_cookie') || JSON.stringify({})); //Obtenemos la sesión del usuario para saber a quien le pertenece la cuenta
             const favorito: Favoritos = new Favoritos(session.id); //Dentro de este objeto pondremos el identificador del usuario que se traera en base a la cookie que se tenga guardada
             const resultado = await favorito.decideAction(productoID); //Decidimos si el producto se va a marcar como favorito o se va a desmarcar de la lista de favoritos
             //Retornamos el valor que nos devuelva nuestro metodo
@@ -119,6 +118,30 @@ const favorites_abc: controladores_favoritos = {
             }})
         }
     },
+}
+
+const carritos_abc: controladores_carrito = {
+    obtener: async (c:Context) => {
+        return c.json({ estatus: 1 });
+    },
+    guardar: async (c:Context) => {
+        try {
+            const userId = JSON.parse(getCookie(c, "usuario_cookie") || "{}");
+            const {producto, cantidad} = await c.req.json()
+            const carrito: Carrito = new Carrito(userId);
+            const resultado = await carrito.addToCart(producto, cantidad);
+            return c.json( resultado );
+        } catch (error) {
+            console.log("[Ruta guardar carrito] Ha ocurrido un error: ", error);
+            return c.json({ estatus: 0, result: {
+                info: "Ha ocurrido un error",
+                data: []
+            }});
+        }
+    },
+    actualizar: async (c:Context) => {
+        return c.json({ estatus: 1 });
+    }
 }
 
 const categorias = {
