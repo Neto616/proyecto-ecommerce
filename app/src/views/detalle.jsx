@@ -32,53 +32,63 @@ function DetalleProductos () {
     }, [location]);
 
     return (
-        <main className="main-content">
-            <div className="product-detail-container">
-                <div className="product-gallery">
-                    <div className="main-image">
-                        <img
-                        src={"http://localhost:3001/images/"+datos.sku+"/"+datos.imagen}
-                        alt={datos.nombre}
-                        />
-                    </div>
+        <main className="page-container"> 
+          <section className="detalle-producto"> 
+            <div className="contenedor-detalle">
+              <div className="detalle-imagen">
+                <img
+                  src={`http://localhost:3001/images/${datos.sku}/${datos.imagen}`}
+                  alt={datos.nombre}
+                />
+              </div>
+
+              <div className="detalle-info">
+                <h1 className="titulo-producto">{datos.nombre}</h1>
+                <p className="codigo-producto">Código de producto: {datos.sku}</p>
+
+                <div className="separador" />
+
+                <p className="subtitulo">Descripción:</p>
+                <p className="descripcion-producto">{datos.descripcion}</p>
+
+                <p className="precio-producto">${datos.precio_format}</p>
+
+                <div className="selector-cantidad">
+                  <label htmlFor="cantidad">Cantidad:</label>
+                  <div className="botones-cantidad">
+                    <button onClick={() => quantity > 1 && setQuantity(quantity - 1)}>-</button>
+                    <input type="number" value={quantity} readOnly />
+                    <button onClick={() => quantity < datos.existencia && setQuantity(quantity + 1)}>+</button>
+                  </div>
                 </div>
-        <div className="product-info">
-          <h1>{datos.nombre}</h1>
-          <p className="price">${datos.precio_format}</p>
-          <p className="description">
-            {datos.descripcion}
-          </p>
 
-          <div className="product-options">
-            <label for="quantity" style= {{textAlign: "left"}}>Cantidad:</label>
-            <div className="quantity-selector">
-              <button type="button" id="decrement-qty" onClick={()=> quantity > 1 ? setQuantity(quantity - 1) : null}>-</button>
-              <input type="number" id="quantity" value={quantity} min="1" max={datos.existencia} readOnly/>
-              <button type="button" id="increment-qty" onClick={()=> quantity < datos.existencia ? setQuantity(quantity + 1) : null}>+</button>
+                <button className="boton-comprar">
+                  {/* <FontAwesomeIcon icon="fa-shopping-cart" /> */} Comprar ahora
+                </button>
+              </div>
             </div>
-          </div>
+          </section>
 
-          <div className="action-buttons">
-            <button type="button" className="btn-primary">
-              <FontAwesomeIcon icon="fa-shopping-cart"/> Agregar al Carrito
-            </button>
-            <button type="button" className="btn-favorite">
-              <FontAwesomeIcon icon="fa-heart"/> Añadir a Favoritos
-            </button>
-          </div>
+          {/* Productos relacionados */}
+          <section className="productos-relacionados">
+            <h2 className="titulo-producto">Productos Relacionados</h2> 
+            <div className="contenedor-detalle">
+              {relacionados.length > 0 &&
+                relacionados.map((e, i) => (
+                  <ProductCard
+                    key={i}
+                    productId={e.id}
+                    nombre={e.nombre}
+                    precio={e.precio_format}
+                    sku={e.sku}
+                    imgName={e.imagen}
+                    isFav=""
+                  />
+                ))}
+            </div>
+          </section>
+        </main>
 
-        </div>
-      </div>
-
-      <section className="related-products">
-        <h2>Productos Relacionados</h2>
-        <div className="product-grid">
-          {relacionados.length ? (
-            relacionados.map((e, i) => <ProductCard key = {i} productId = {e.id} nombre = {e.nombre} precio = {e.precio_format} sku = {e.sku} imgName={e.imagen} isFav = {""}/>)
-          ) : null}
-        </div>
-      </section>
-    </main>
     );
 }
 

@@ -37,7 +37,7 @@ code {
 }
 
 .sort-btn {
-    background-color: #007bff; /* Color de fondo del botón */
+    background-color: #43240B; /* Color de fondo del botón */
     color: white; /* Color del texto */
     border: none;
     padding: 8px 15px;
@@ -51,12 +51,12 @@ code {
 }
 
 .sort-btn:hover {
-    background-color: #0056b3; /* Color al pasar el ratón */
+    background-color: #43240B; /* Color al pasar el ratón */
     transform: translateY(-1px); /* Pequeño efecto al pasar el mouse */
 }
 
 .sort-btn.active { /* Para cuando el botón está activo */
-    background-color: #0056b3;
+    background-color: #43240B;
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2); /* Efecto de "presionado" */
 }
 
@@ -82,7 +82,7 @@ code {
 }
 
 .pagination-btn {
-    background-color: #007bff;
+    background-color: #43240B;
     color: white;
     border: none;
     padding: 8px 15px;
@@ -97,12 +97,12 @@ code {
 }
 
 .pagination-btn:hover {
-    background-color: #0056b3;
+    background-color: #43240B;
     transform: translateY(-1px);
 }
 
 .pagination-btn.active {
-    background-color: #0056b3; /* Color para el botón de página actual */
+    background-color: #43240B; /* Color para el botón de página actual */
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
     font-weight: bold;
 }

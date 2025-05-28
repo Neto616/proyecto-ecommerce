@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link } from 'react-router-dom'; 
 import "../style.css"; 
 import ProductCard from "../components/presentacion_productos/ProductCard.jsx";
-
+import Banner from "../icons/Banner.png";
 
 function Inicio() { 
     const [destacados, setDestacados] = useState([]);
@@ -25,12 +25,14 @@ function Inicio() {
     return (
         <>
         <main className="main-content">
-            <section className="hero-banner">
-                <h1>Grandes Ofertas, Grandes Sonrisas</h1>
-                <p>Descubre lo último en tecnología, moda y mucho más.</p>
-                <Link to="/productos" className="btn-primary">Ver Productos</Link>
-            </section>
-            
+            <Link to="/productos" className="hero-banner-link">
+                <img 
+                    src={Banner} 
+                    alt="Grandes Ofertas, Grandes Sonrisas" 
+                    className="hero-banner-image"
+                />
+            </Link>
+
             <section className="product-grid-section">
                 <h2>Productos Destacados</h2>
                 <div className="product-grid">

@@ -22,21 +22,35 @@ function ProductCard({ productId, nombre, precio, sku, imgName, isFav }) {
     }
 
     return (
-        <div className="product-card" >
+        <div className="product-card" onClick={() => navigate(`/detalle/${sku}`)}>
             <img
-            src={"http://localhost:3001/images/"+sku+"/"+imgName}
-            alt={nombre}
+                src={`http://localhost:3001/images/${sku}/${imgName}`}
+                alt={nombre}
             />
-            <FontAwesomeIcon icon="fa-heart" className={`favorite-icon ${isFav ? "active" : ""}`} onClick={()=> addToFav(productId)}/>
-            <div className="product-card-info" >
-                <h3 onClick={()=> navigate(`/detalle/${sku}`)}>{nombre}</h3>
+            <FontAwesomeIcon
+                icon="fa-heart"
+                className={`favorite-icon ${isFav ? "active" : ""}`}
+                onClick={(e) => {
+                    e.stopPropagation(); // Evita que se propague el click al card
+                    addToFav(productId);
+                }}
+            />
+            <div className="product-card-info">
+                <h3>{nombre}</h3>
                 <p className="price">${precio}</p>
-                <button type="button" className="add-to-cart-btn">
+                <button
+                    type="button"
+                    className="add-to-cart-btn"
+                    onClick={(e) => {
+                        e.stopPropagation(); //botón agregue sin navegar
+                    }}
+                >
                     <FontAwesomeIcon icon="fa-shopping-cart" /> Agregar
                 </button>
             </div>
         </div>
     );
+
 }
 
 export default ProductCard

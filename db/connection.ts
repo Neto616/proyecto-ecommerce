@@ -30,7 +30,7 @@ abstract class Consultas {
       const hostname = env.HOST || "localhost";
       const username = env.USR || "root";
       const database = env.DB || "ecommerce";
-      const password = env.PASS || "Neto_616";
+      const password = env.PASS || "12345";
       const port = env.PORT || "3306";
 
       if (!hostname || !username || !database || !password) {

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import "./Topbar.css";
 
 function TopBar({ onBurgerClick }){
     const navigate = useNavigate();
@@ -32,10 +33,19 @@ function TopBar({ onBurgerClick }){
     return(
         <header className="top-bar">
             <div className="top-bar-left">
-                <button type="button" className="burger-button" aria-label="Menú de Categorías" onClick={onBurgerClick}>
-                    <FontAwesomeIcon icon="fa-solid fa-bars" />
+                <Link to="/" className="logo">
+                    <img src="/LogoETop.png" alt="Logo de la tienda" className="logo-img" />
+                </Link>
+                <button
+                    type="button"
+                    className="burger-button"
+                    onClick={onBurgerClick}
+                >
+                    <FontAwesomeIcon icon="fa-solid fa-bars" className="burger-icon" />
+                    <span className="burger-text">Categorías</span>
                 </button>
-                <Link to="/" className="logo">Mi Tienda</Link>
+
+                
             </div>
             <div className="top-bar-center">
                 <div className="search-bar">
