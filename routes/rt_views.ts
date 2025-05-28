@@ -3,7 +3,7 @@ import { Hono, Context } from 'hono';
 //Este modulo nos permitira borrar las cookies creadas
 import { getCookie, deleteCookie } from 'hono/cookie'
 //Importamos los modulos que hemos creado
-import { usuarios, productos, favoritos }from '../controllers/ctrl_views.ts';
+import { usuarios, productos, favoritos, carrito }from '../controllers/ctrl_views.ts';
 import { categorias } from "../controllers/ctrl_controllers.ts";
 import { hasSession } from "../middlewares/general.ts";
 //Inicializamos nuestro objeto de tipo Hono
@@ -25,6 +25,7 @@ route.get("/", usuarios.inicio);
 //Estas rutas traen información en un JSON
 route.get("/productos", productos.todos); //Recolecta y envia los productos dependiendo de los filtros que este tenga en la ruta
 route.get("/destacados", productos.destacados); //Trae los productos destacados del sitio (Los primeros 4)
+route.get("/carrito", /*hasSession,*/ carrito.obtener);
 route.get("/favoritos", hasSession, favoritos.getFavs); 
 route.get("/categoria", categorias.getCategoria); //Trae una lista con todas las categorias que se tengan en base de datos
 route.get("/user_exist", usuarios.existe); //Ruta que avisa si el usuario existe o no para saber donde redirigirlo

@@ -1,7 +1,7 @@
 // Importamos el modulo necesario de la paqueteria hono
 import { Context } from "hono";
 // Importamos los modulos que generamos dentro del proyecto
-import { Favoritos, Usuarios } from "../db/consultas.ts";
+import { Carrito, Favoritos, Usuarios } from "../db/consultas.ts";
 import { vistas_productos, vistas_usuarios } from "../types/tipos_rutas.ts";
 import { Productos } from "../db/consultas.ts";
 import { getCookie } from 'hono/cookie';
@@ -145,5 +145,21 @@ const favoritos = {
         }
     }
 }
+
+const carrito = {
+    obtener: async (c:Context) => {
+        try {
+            const userId = JSON.parse(getCookie(c, "usuario_cookie") || JSON.stringify({id:2}));
+            console.log(userId)
+            const carrito: Carrito = new Carrito(userId.id);
+            const resultado = await carrito.carrito();
+
+            return c.json(resultado)
+        } catch (error) {
+            console.error("Ha ocurrido un error favor de intentarlo nuevamente: ", error);
+            return c.json({ estatus: 0, info: { message: "Ha ocurrido un error al momento de quere obtener los datos del carrito"}})
+        }
+    }
+}
 //Exportamos nuestros dos objetos que se usaran en las rutas
-export {usuarios, productos, favoritos}
+export {usuarios, productos, favoritos, carrito}

@@ -1,16 +1,16 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
-function ProductItem() {
+function ProductItem({ productId, nombre, precio, precioTotal, sku, imgName }) {
     return (
         <div className="cart-item">
                             <img
-                                src="https://pm1.aminoapps.com/7976/5456503b36b384de7f9aede9d3a7dcab14dfd0f1r1-227-222v2_hq.jpg"
+                                src={"http://localhost:3001/images/"+sku+"/"+imgName}
                                 alt="Producto A"
                             />
                             <div className="item-details">
-                                <h3>Nombre del Producto A Muy Largo para Prueba</h3>
-                                <p className="item-price">$120.00</p>
+                                <h3>{nombre}</h3>
+                                <p className="item-price">${precio}</p>
                                 
                                 <div className="quantity-selector">
                                     <button type="button" className="decrement-qty">-</button>
@@ -25,7 +25,7 @@ function ProductItem() {
                                 </div>
                             </div>
                     <div className="item-actions">
-                        <p className="item-total">$120.00</p>
+                        <p className="item-total">${precioTotal}</p>
                         <button type="button" className="remove-item-btn">
                             <FontAwesomeIcon icon="fas fa-trash-alt"/> Eliminar
                         </button>
