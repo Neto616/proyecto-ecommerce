@@ -121,9 +121,6 @@ const favorites_abc: controladores_favoritos = {
 }
 
 const carritos_abc: controladores_carrito = {
-    obtener: async (c:Context) => {
-        return c.json({ estatus: 1 });
-    },
     guardar: async (c:Context) => {
         try {
             const userId = JSON.parse(getCookie(c, "usuario_cookie") || "{}");
@@ -161,5 +158,6 @@ const categorias = {
 export { 
     usuarios_abc, 
     favorites_abc,
+    carritos_abc,
     categorias
 }

@@ -314,7 +314,7 @@ class Productos extends Consultas{
 //Creamos una clase Carrito que hereda Consultas
 class Carrito extends Consultas {
     //Creamos nuestro constructor con un atributo privado usuarioId para poder ingresar al carrito de nuestro usuario.
-    constructor(private usuarioId: number){
+    constructor(private usuarioId: number = 2){
         super();
     }
     //Creamos un getter para obtener nuestro atributo privado (No es necesario pero se deja)
@@ -329,8 +329,25 @@ class Carrito extends Consultas {
             //realizara el metodo para conectar la base de datos
             if(!this.db) await this.initDB();
             //Obtenemos los datos de la vista creada que nos daran los productos que el usuario tenga almacenado en el carrito
-            const { rows } = await this.db.execute(`select * from vista_carrito where id_usuario = ?;`, [this.getUsuarioId()]);
+            const { rows } = await this.db.execute(`
+                select 
+                    p.id, 
+                    p.id_usuario,
+                    prod.sku,
+                    format(p.precio_total, 2) as total_pagar,
+                    pp.producto,
+                    prod.imagen,
+                    pp.cantidad,
+                    format(pp.precio, 2) as precio_formateado,
+                    format(pp.precio_total, 2) as precio_total_formateado,
+                    p.fecha_pedido,
+                    p.fecha_cierre_pedido
+                from pedidos p
+                inner join pedidos_partidas pp on pp.id_pedido = p.id
+                inner join productos prod on prod.id = pp.id_producto
+                where p.id_usuario = ? and p.fecha_cierre_pedido is null`, [this.getUsuarioId()]);
             //Retornamos un JSON con estado 1 y con los datos listados de los objetos
+            console.log(`Usuario: ${this.getUsuarioId()}\nRESULTADO: ${rows}`)
             return {
                 estatus: 1,
                 info: {
