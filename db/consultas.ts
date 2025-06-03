@@ -29,6 +29,8 @@ class Usuarios extends Consultas{
             const {rows} = await this.db.execute(
                 "call alta_usuarios(?, ?, ?, ?, ?)",
                 [this.nombre, this.apellidos, (this?.whatsapp || ''), this.correo, this.contrasena])
+
+            console.log(rows)
             //Retornamos un estado y los resultados de la consulta
             return {estatus: 1, result:{info: "Se ha creado el usuario de manera exitosa", data: rows || []}}
         } catch (error) {
@@ -41,12 +43,14 @@ class Usuarios extends Consultas{
         try {
             //En caso de que db no este inicializado llamamos a su metodo initDB para asignarle un valor
             if(!this.db) await this.initDB();
+            console.log("Wpp: ", this.whatsapp)
             //Nuevamente ejecutamos el procedimiento almacenado actualizar_usuarios y obtendremos los datos
             //que nos traiga el procedimiento
             const {rows} = await this.db.execute(
-                "call actualizar_usuarios (?, ?, ?, ?, ?);",
-                [id, this.nombre, this.contrasena, this.apellidos, this.whatsapp]
+                "call actualizar_usuarios (?, ?, ?, ?);",
+                [id, this.nombre, this.apellidos, this.whatsapp]
             );
+            console.log(rows)
             //Retornamos un estado y los resultados de la consulta
             return {
                 estatus: 1, 
@@ -94,33 +98,77 @@ class Usuarios extends Consultas{
     //En los parametros recibiremos el correo y la contraseña que seran strings
     public static async iniciarSesion(correo: string, contrasena: string) {
         try {
-            //Creamos una variable de tipo usuarios para poder acceder a la base de datos
             const conectar = new Usuarios();
-            //En caso de db no tenga algun valor procederemos a iniciar la conexión a la base de datos
             if(!conectar.db) await conectar.initDB();
-            //Obtenemos los resulatdos de la consulta y en el arreglo pondremos los datos que necesitamos para la misma
+
+            // Clave de desencriptación. ¡CUIDADO! En un entorno de producción,
+            // esta clave NUNCA debe estar hardcodeada. Debe obtenerse de variables de entorno
+            // o un sistema de gestión de secretos.
+            const DECRYPTION_KEY = "EstoEsUnS3cr3t0P4raLa_Passw0Rd";
+
+            // Primero, selecciona el usuario por su correo Y desencripta su contraseña
+            // directamente en la consulta SQL.
             const {rows} = await conectar.db.execute(
-                "select * from usuarios where correo like ? and contrasena like ?",
-                [correo, contrasena]
+                `SELECT 
+                    id, 
+                    nombre, 
+                    apellidos, 
+                    whatsapp, 
+                    correo,
+                    CAST(AES_DECRYPT(contrasena, ?) AS CHAR) AS decrypted_contrasena
+                 FROM usuarios 
+                 WHERE correo = ?`,
+                [DECRYPTION_KEY, correo] // Pasa la clave y el correo como parámetros
             );
-            //Retornaremos un JSON con el estatus 1 y los resultados que se encontraron
-            return {
-                estatus: 1,
-                result: {
-                    result: rows || [],
-                }
-            };
+
+            // Verificar si se encontró un usuario
+            if (!rows || rows.length === 0) {
+                return {
+                    estatus: 0,
+                    result: {
+                        info: "Correo o contraseña incorrectos",
+                        result: []
+                    }
+                };
+            }
+
+            // Si se encontró un usuario, la contraseña desencriptada estará en `rows[0].decrypted_contrasena`
+            const user = rows[0];
+            const decryptedPasswordFromDb = user.decrypted_contrasena;
+
+            // Ahora, compara la contraseña desencriptada de la DB con la contraseña ingresada por el usuario
+            const passwordMatches = (decryptedPasswordFromDb === contrasena);
+
+            if (passwordMatches) {
+                // Si la contraseña coincide, retorna los datos del usuario (sin la contraseña explícita)
+                // Es buena práctica no devolver la contraseña (incluso desencriptada) al cliente.
+                delete user.decrypted_contrasena; // Elimina la contraseña desencriptada del objeto antes de retornar
+
+                return {
+                    estatus: 1,
+                    result: {
+                        result: [user], // Retorna el objeto de usuario en un array
+                    }
+                };
+            } else {
+                // Contraseña incorrecta
+                return {
+                    estatus: 0,
+                    result: {
+                        info: "Correo o contraseña incorrectos",
+                        result: []
+                    }
+                };
+            }
         } catch (error) {
-            //En caso de error lo imprimimos en consola
-            console.log(error);
-            //Retornamos un estado 0 por ser un error y en la información pondremos el error que tenemos
+            console.error("Error en iniciarSesion:", error);
             return {
-                estatus: 0, 
+                estatus: 0,
                 result: {
-                    info: error,
+                    info: "Ocurrió un error al intentar iniciar sesión.",
                     result: []
                 }
-            }
+            };
         }
     }
     //Metodo estatico y asincrono
@@ -143,7 +191,7 @@ class Usuarios extends Consultas{
     }
 }
 //Creamos una clase que se encargue uniacmente de cargar la información del usuario de manera efectiva
-class UsuarioService extends Consultas {
+class MiCuenta extends Consultas {
     constructor(private id: number){ super() }
     //Getter para manipulación futura del id de manera interna
     public getId (): number {
@@ -156,7 +204,7 @@ class UsuarioService extends Consultas {
 
             const { rows } = await this.db.execute(`
                 select
-                    *
+                    nombre, apellidos, whatsapp as wpp, correo
                 from usuarios
                 where id = ?
             `, [this.getId()]);
@@ -169,31 +217,6 @@ class UsuarioService extends Consultas {
             console.log("Ha ocurrido obteniendo la información del usuario: ", error);
             return { estatus: 0, result: {
                 info: "Ha ocurrido un error",
-                data: []
-            }}
-        }
-    }
-    //Metodo para traer los datos que se encargaran en mi cuenta
-    public async getDirections() {
-        try {
-            if (!this.db) await this.initDB();
-
-            const { rows } = await this.db.execute(`
-                select 
-                    u.*,
-                    d.*
-                from usuarios u
-                inner join direcciones d on u.id = d.usuario
-                where u.id = ?`, [this.getId()]);
-
-            return {estatus: 1, result: {
-                info: "Las direcciones del usuario",
-                data: rows || []
-            }}
-        } catch (error) {
-            console.log(error);
-            return {estatus: 0, result: {
-                info: "No se puede obtener información sobre este usuario",
                 data: []
             }}
         }
@@ -519,6 +542,60 @@ class Pedido extends Consultas {
         return this.usuarioId;
     }
 
+    public async getOrders(pagina: number, cantidad: number){
+        try {
+            if(!this.db) await this.initDB();
+
+            const totalPedidos = await this.db.query(`select count(*) as pedidos from pedidos where id_usuario = ? and fecha_cierre_pedido is not null;`, [this.getUsuarioId()]);
+            let paginaMaxima: number;
+            if(totalPedidos) paginaMaxima = Math.ceil(totalPedidos[0].pedidos/cantidad);
+            else paginaMaxima = Math.ceil(1/cantidad);
+            //Limite de los productos a mostrar por paginas
+            const limit: number = cantidad;
+            //Numero por el cual empezaremos a mostrar dichos productos
+            const offset: number = (pagina - 1) * cantidad;
+            const {rows }= await this.db.execute(`
+                select 
+                    id,
+                    DATE_FORMAT(fecha_cierre_pedido, '%d-%m-%Y') as fecha_cierre_pedido, 
+                    format(precio_total, 2) as precio_total
+                from pedidos
+                where id_usuario = ? and fecha_cierre_pedido is not null order by id desc
+                limit ${limit} offset ${offset};
+            `, [this.getUsuarioId()])
+
+            return {
+                estatus: 1,
+                info: {
+                    message: "Listado de los productos favoritos del usuario",
+                    data: {
+                        pedidos: rows || [],
+                        pagina_actual: pagina,
+                        pagina_maxima: paginaMaxima,
+                        limite: cantidad,
+                    }
+                }
+            };
+        } catch (error) {
+             //En caso de error imprimimos en consola el error que salio
+            console.log(error);
+            //Retornamos un JSON con el estado en cero marcando que hubo un error junto con datos vacios para evitar errores en el front
+            return {
+                estatus: 0,
+                info: {
+                    message: "Ha ocurrido un error: "+error,
+                    data: {
+                        pedidos: [],
+                        pagina: pagina,
+                        pagina_maxima: pagina,
+                        limite: cantidad,
+                        cantidadFavoritos: 0
+                    }
+                }
+            };
+        }
+    }
+
     public async cerrarPedido(){
         try {
             if(!this.db) await this.initDB();
@@ -804,6 +881,7 @@ class Categorias extends Consultas {
 //Se exportan cada uno de los objetos creados en la parte superior y asi poder utilizarlos en otros archivos
 export { 
     Usuarios, 
+    MiCuenta,
     Productos,
     Carrito,
     Pedido,

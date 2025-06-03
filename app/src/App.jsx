@@ -3,9 +3,28 @@ import { Routes, Route, BrowserRouter } from "react-router-dom";
 import './App.css';
 import Index from "./views/inicio.jsx";
 import { library } from '@fortawesome/fontawesome-svg-core';
-import { faSearch, faBars, faShoppingCart, faHeart, 
-  faUserCircle, faChevronLeft, faChevronRight, faSortAmountUp, faSortAmountDown, faSortAlphaDown, faSortAlphaUp,
-  faMinus, faPlus, faUser, faEnvelope, faLock, faEye, faEyeSlash } from '@fortawesome/free-solid-svg-icons';
+import { 
+  faSearch, 
+  faBars, 
+  faShoppingCart, 
+  faHeart, 
+  faUserCircle, 
+  faChevronLeft, 
+  faChevronRight, 
+  faSortAmountUp, 
+  faSortAmountDown, 
+  faSortAlphaDown, 
+  faSortAlphaUp,
+  faMinus, 
+  faPlus, 
+  faUser, 
+  faEnvelope, 
+  faLock, 
+  faEye, 
+  faEyeSlash,
+  faSignOutAlt, 
+  faBox 
+} from '@fortawesome/free-solid-svg-icons';
 //Componentes para el usuario
 import RegistroUsuario from "./views/usuario/registro.jsx"
 import IniciarSesion from "./views/usuario/iniciar_sesion.jsx";
@@ -20,7 +39,7 @@ import DetalleProductos from "./views/detalle.jsx";
 
 library.add( faSearch, faBars, faShoppingCart, faHeart, faUserCircle, faChevronLeft, faChevronRight, 
   faSortAmountUp, faSortAmountDown, faSortAlphaDown, faSortAlphaUp, faMinus, faPlus, faUser, faEnvelope,
-  faLock, faEye, faEyeSlash );
+  faLock, faEye, faEyeSlash, faSignOutAlt, faBox );
 
 function App() {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);

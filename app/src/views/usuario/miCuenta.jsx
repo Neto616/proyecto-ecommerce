@@ -1,8 +1,75 @@
-import React from "react";
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import { data, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"; 
 
 function MiCuenta () {
+    const navigate = useNavigate();
+    const [section, setSection] = useState("profile");
+    const [userData, setUserData] = useState({ nombre: "", apellidos: "", correo: "", wpp: ""});
+    const [orders, setOrders] = useState([]);
+
+    const changeValue = (e) => {
+      const { name, value } = e.target;
+      setUserData((prev)=> ({ ...prev, [name]: value}));
+    }
+
+    const updateUserData = async (e) => {
+      try {
+        e.preventDefault();
+        console.log(userData);
+        const peticion = await fetch("http://localhost:3001/api/actualizar-usuario", {method: "PUT", body: JSON.stringify(userData)});
+        const resultado = await peticion.json();
+        console.log(resultado);
+        if(resultado.estatus === 0 || resultado.estatus === -2) {
+          alert("Debes iniciar sesión para poder actualizar tus datos");
+          return navigate("/iniciar-sesion");
+        }
+
+        alert("Se han actualizado los datos del usuario");
+      } catch (error) {
+        console.error("Ha ocurrido un error al actualizar usuario: ", error);
+        // window.location.reload();
+      }
+    }
+
+    const getUserData = async () => {
+      try {
+        const peticion = await fetch("http://localhost:3001/api/user_info", {method: "GET", headers: { "Content-Type": "application/json" }})
+        const resultado = await peticion.json();
+        console.log(resultado)
+        if(!resultado.estatus || resultado.estatus == -2){
+          alert("Necesitas iniciar sesión para entrar a esta sección");
+          return navigate("/iniciar-sesion")
+        }
+        setUserData(resultado.result.data[0]);
+      } catch (error) {
+        console.error("Ha ocurrido un problema al obtener los datos del usuario: ", error);
+        setUserData({ nombre: "", apellido: "", correo: "", wpp: ""})
+      }
+    }
+
+    const getOrders = async () => {
+      try {
+        const peticion = await fetch("http://localhost:3001/api/user_orders", {method: "GET", headers: {"Content-Type": "application/json"}});
+        const resultado = await peticion.json();
+        console.log("Pedidos: ", resultado)
+         if(!resultado.estatus || resultado.estatus == -2){
+          alert("Necesitas iniciar sesión para entrar a esta sección");
+          return navigate("/iniciar-sesion")
+        }
+        setOrders(resultado.info.data.pedidos)
+      } catch (error) {
+        console.error("Ha ocurrido un error obteniendo los pedidos del usuario: ", error);
+
+      }
+    }
+
+    useEffect(()=>{
+      if(section === "profile") getUserData();
+      if(section === "orders") getOrders();
+      else console.log("c papu")
+    }, [section])
+
     return (
     <>
     <main className="main-content">
@@ -10,139 +77,71 @@ function MiCuenta () {
             <aside className="account-sidebar">
                 <ul className="account-menu">
                     <li>
-                        <a href="#profile" id="profile-link" className="active">
+                        <a onClick={()=> setSection("profile")} id="profile-link" className={section === "profile" ? "active" : ""}>
                             <FontAwesomeIcon icon="fas fa-user"/>
                              Mi Perfil
                         </a>
                     </li>
                     <li>
-                        <a href="#orders" id="orders-link">
+                        <a onClick={()=> setSection("orders")} id="orders-link" className={section === "orders" ? "active" : ""}>
                             <FontAwesomeIcon icon="fas fa-box"/>
                         Mis Pedidos</a>
                     </li>
                     <li>
-                        <a href="#addresses" id="addresses-link">
-                            <FontAwesomeIcon icon="fas fa-map-marker-alt"/>
-                        Mis Direcciones</a>
-                    </li>
-                    <li>
-                        <a href="#favorites" id="favorites-link">
-                            <FontAwesomeIcon icon="fas fa-heart"/>
-                            Mis Favoritos</a>
-                    </li>
-                    <li>
-                        <a href="#payments" id="payments-link">
-                            <FontAwesomeIcon icon="fas fa-credit-card"/>
-                            Métodos de Pago</a> 
-                    </li>
-                    <li>
-                        <a href="login.html">
+                        <a onClick={()=> window.location.href = "/api/cerrar-sesion"}>
                             <FontAwesomeIcon icon="fas fa-sign-out-alt"/>
                             Cerrar Sesión</a>
                     </li>
                 </ul>
             </aside>
             <section className="account-content">
-                <div id="profile" className="account-section active-section">
+                <div id="profile" className={`account-section ${section == "profile" ? "active-section": ""}`}>
                     <h3>Mi Perfil</h3>
-                    <form>
+                    <form onSubmit={(e)=> updateUserData(e)}>
                         <div className="input-group">
-                            <label for="acc-name">Nombre(s):</label>
-                            <input type="text" id="acc-name" value="Juan" />
+                            <label for="nombre">Nombre(s):</label>
+                            <input type="text" id="nombre" onChange={changeValue}
+                            name="nombre" value={userData?.nombre || ""} />
                         </div>
                         <div className="input-group">
-                            <label for="acc-lastname">Apellidos:</label>
-                            <input type="text" id="acc-lastname" value="Pérez García" />
+                            <label for="apellidos">Apellidos:</label>
+                            <input type="text" id="apellidos" name="apellidos" onChange={changeValue}
+                            value={userData?.apellidos || ""} />
                         </div>
                         <div className="input-group">
-                            <label for="acc-email">Correo Electrónico:</label>
+                            <label for="correo">Correo Electrónico:</label>
                             <input
                             type="email"
-                            id="acc-email"
-                            value="juan.perez@ejemplo.com"
+                            id="correo"
+                            name="correo"
+                          //  onChange={changeValue}
+                            value={userData?.correo || ""}
                             />
                         </div>
                         <div className="input-group">
-                            <label for="acc-whatsapp">WhatsApp:</label>
-                            <input type="text" id="acc-whatsapp" value="+52 123 456 7890" />
+                            <label for="wpp">WhatsApp:</label>
+                            <input type="text" id="wpp" onChange={changeValue}
+                            name="wpp" value={userData?.wpp || ""} />
                         </div>
                         <button type="submit" className="btn-primary">Guardar Cambios</button>
                     </form>
                 </div>
-        <div id="orders" className="account-section">
-            <h3>Mis Pedidos</h3>
-            <div className="order-item">
-              <h4>Pedido #12345 - 2024-05-20</h4>
-              <p>Total: $550.00</p>
-              <p>Estado: **Enviado**</p>
-              <p><a href="#">Ver Detalles del Pedido</a></p>
-            </div>
-            <div className="order-item">
-              <h4>Pedido #12344 - 2024-05-15</h4>
-              <p>Total: $120.50</p>
-              <p>Estado: **Entregado**</p>
-              <p><a href="#">Ver Detalles del Pedido</a></p>
-            </div>
-          </div>
+                <div id="orders" className={`account-section ${section == "orders" ? "active-section": ""}`}>
+                  <h3>Mis Pedidos</h3>
+                  {orders.length ? (
+                    orders.map((e, i) => { return (
+                      <div key={i} className="order-item">
+                        <h4>Pedido #{e.id} - {e.fecha_cierre_pedido}</h4>
+                        <p>Total: ${e.precio_total}</p>
+                        <p>Estado: Finalizado</p>
+                        {/* <p><a href="#">Ver Detalles del Pedido</a></p> */}
+                      </div>
+                    )})
+                      ) : (<h4>Aun no has realizado un pedido 😪</h4>)}
 
-        <div id="addresses" className="account-section">
-            <h3>Mis Direcciones</h3>
-            <div className="address-item">
-              <p><strong>Dirección Principal:</strong></p>
-              <p>Calle Falsa 123, Colonia Centro</p>
-              <p>Ciudad de México, CP 01234</p>
-              <div className="address-actions">
-                <button type="button">Editar</button>
-                <button type="button">Eliminar</button>
-              </div>
-            </div>
-            <button type="button" className="btn-primary">Agregar Nueva Dirección</button>
-          </div>
 
-        <div id="favorites" className="account-section">
-            <h3>Mis Favoritos</h3>
-            <div className="product-grid">
-              <div className="product-card">
-                <img
-                  src="https://via.placeholder.com/250x200?text=Favorito+1"
-                  alt="Laptop Ultrabook"
-                />
-                <i className="fas fa-heart favorite-icon active"></i>
-                <div className="product-card-info">
-                  <h3>Laptop Ultrabook</h3>
-                  <p className="price">$1200.00</p>
-                  <button type="button" className="add-to-cart-btn">
-                    <i className="fas fa-shopping-cart"></i> Agregar
-                  </button>
-                </div>
-              </div>
-              <div className="product-card">
-                <img
-                  src="https://via.placeholder.com/250x200?text=Favorito+2"
-                  alt="Auriculares Bluetooth"
-                />
-                <i className="fas fa-heart favorite-icon active"></i>
-                <div className="product-card-info">
-                  <h3>Auriculares Bluetooth</h3>
-                  <p className="price">$75.00</p>
-                  <button type="button" className="add-to-cart-btn">
-                    <i className="fas fa-shopping-cart"></i> Agregar
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        <div id="payments" className="account-section">
-            <h3>Métodos de Pago</h3>
-            <p>
-              Aquí se mostrarán tus métodos de pago guardados (ej. tarjetas de
-              crédito/débito).
-            </p>
-            <p>Actualmente no hay métodos de pago registrados.</p>
-            <button type="button" className="btn-primary">Agregar Método de Pago</button>
-          </div>
-        </section>
+                  </div>
+       </section>
       </div>
     </main>
         </>

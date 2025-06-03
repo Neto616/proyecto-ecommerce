@@ -4,8 +4,9 @@ import { Context } from "hono";
 import { getCookie, setCookie} from 'hono/cookie'
 //Importamos los modulos que generamos de nuestor proyecto
 import { controladores_carrito, controladores_usuario } from "../types/tipos_rutas.ts";
-import {Carrito, Categorias, Favoritos, Usuarios, Pedido} from '../db/consultas.ts';
+import { Carrito, Categorias, Favoritos, Usuarios, Pedido, MiCuenta } from '../db/consultas.ts';
 import { controladores_favoritos } from '../types/tipos_rutas.ts';
+import { use } from "hono/jsx";
 
 //Generamos nuestra constante que sera un JSON del tipo asignado con las funciones necesarias para 
 //ser llamadas en la ruta correspondiente
@@ -30,32 +31,31 @@ const usuarios_abc: controladores_usuario = {
     },
     //Funcion encargada de actualizar los datos del usuario
     actualizar: async (c: Context) => {
-        const { id } = c.req.param() //Se cambiara para obtener el identificador desde la sesion que se tenga
+        const userId = JSON.parse(getCookie(c, "usuario_cookie") || JSON.stringify({ id: 0 }));
         //Se obtienen unicamente los elementos necesarios del body para poder actualizar los datos del usuario
-        const {nombre, apellidos, correo, whatsapp, contrasena, confirmacion} = await c.req.parseBody();
+        const {nombre, apellidos, wpp } = await c.req.json();
         //En caso de que no se tenga un identifiacdor retorna un estatus que hara que se mueve a la seccion para iniciar sesión
-        if(!id) return c.json({ estatus: 3, result: {info: "No hay usuario"}});
-        //En caso de que la contraseña y la confirmación no sean iguales se avisara con un estado distinto para que  se proceso en el front
-        if(contrasena !== confirmacion) return c.json({ estatus: 2, result: {info: "Contraseñas no similarerss"}});
+        if(!userId.id) return c.json({ estatus: 3, result: {info: "No hay usuario"}});
         //Generamos nuestra constante de tipo Usuarios con los datos necesarios para poder inicializarlos
         const consulta: Usuarios = new Usuarios(
             nombre.toString(),
             apellidos.toString(),
-            correo.toString(),
-            contrasena.toString(),
-            whatsapp?.toString()
+            "",
+            "",
+            wpp?.toString()
         )
         //Llamamos al metodo actualizar usuario y le pasamos su identificador como parametro
-        consulta.actualizarUsuario(id);
+        consulta.actualizarUsuario(userId.id);
+        
         //Retornamos un JSON que sera procesado por el fron mas delante
         return c.json({ estatus: 1, result: {info: "Actualizar usuario", result: {}}});
     },
     //Función encargada de eliminar usuarios del sitio
     eliminar: async (c: Context) => {
         try {
-            const id:string = "1"; //El id se cambiara para obtenerse desde la cookie que se genere con los datos que este tenga
+            const userId = JSON.parse(getCookie(c, "usuario_cookie") || JSON.stringify({ id: 0 }));
             //El metodo eliminar es un metodo estatico entonces no inicializamos este objeto unicamente llamamos a su respectivo metodo
-            await Usuarios.eliminar(id);
+            await Usuarios.eliminar(userId.id);
             //Retornamos un JSON que el front procesará
             return c.json({ estatus: 1, result: {info: "Eliminar usuario"}});
         } catch (error) {
@@ -94,6 +94,24 @@ const usuarios_abc: controladores_usuario = {
             //En caso de error lo redireccionamos para el inicio de la pagina
             console.log(error);
             return c.redirect("/");
+        }
+    }
+}
+
+const miCuenta = {
+    userInfo: async (c:Context) => {
+        try {
+            const userId = JSON.parse(getCookie(c, "usuario_cookie") || JSON.stringify({ id: 2 }));
+            const userInfo: MiCuenta = new MiCuenta(userId.id);
+            const resultado = await userInfo.getInfo();
+
+            return c.json( resultado );
+        } catch (error) {
+            console.error("Ha ocurrido un error: ", error);
+            return c.json({ estatus: 0, result: {
+                info: "Ha ocurrido un error",
+                data: []
+            }})
         }
     }
 }
@@ -175,6 +193,22 @@ const pedidos_abc = {
                 }
             })
         }
+    },
+    pedidosUsuarios: async (c:Context) => {
+        try {
+            const userId = JSON.parse(getCookie(c, "usuario_cookie") || JSON.stringify({ id: 2 }));
+            const pedido: Pedido = new Pedido(userId.id);
+            const resultado = await pedido.getOrders(1, 12);
+            return c.json(resultado);
+        } catch (error) {
+            console.error("Ha ocurrido un error: ", error);
+            return c.json({
+                estatus: 0, result: {
+                    info: "Ha ocurrido un error",
+                    data: []
+                }
+            })
+        }
     }
 }
 
@@ -194,6 +228,7 @@ const categorias = {
 
 export { 
     usuarios_abc, 
+    miCuenta,
     favorites_abc,
     carritos_abc,
     pedidos_abc,

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react"
 import { useNavigate, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import ProductCard from "../components/presentacion_productos/ProductCard.jsx";
+import eventBus from "../utils/eventBus.js";
 
 function DetalleProductos () {
     const location = useLocation();
@@ -35,7 +36,10 @@ function DetalleProductos () {
                 alert("Debes tener una cuenta para poder guardar productos al carrito")
                 navigate("/");
         }else if(data.estatus === 0) alert("Ha ocurrido un error favor de intentarlo de nuevo");
-        else alert("Se ha guardado el articulo en su carrito");
+        else {
+          eventBus.emit('cartUpdated')
+          alert("Se ha guardado el articulo en su carrito");
+        }
       } catch (error) {
         console.log("[Agregar producto detalle] Ha ocurrido un error: ", error);
         alert("Ha ocurrido algo favor de intentarlo nuevamente");
