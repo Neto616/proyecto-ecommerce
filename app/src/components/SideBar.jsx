@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
-import './SideBar.css';
+import "../style.css"; 
 
 import iconElectronica from '../icons/icn_tecnologia.png';
 import iconHogar from '../icons/icn_hogar.png';

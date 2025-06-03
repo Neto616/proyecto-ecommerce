@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { Link, UNSAFE_getTurboStreamSingleFetchDataStrategy, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import "./Topbar.css";
+import "../style.css"; 
 import eventBus from "../utils/eventBus.js";
 
 function TopBar({ onBurgerClick }){
