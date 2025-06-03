@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import { Link, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import eventBus from '../../utils/eventBus.js';
 
 function IniciarSesion () {
     const navigate = useNavigate();
@@ -23,8 +24,10 @@ function IniciarSesion () {
             if(data.estatus === 3) return alert(data.result.info.includes("contraseña") ? "La contraseña debe tener minimo seis caracteres" : "Favor de llenar todos los campos")
             
             e.target.reset();
+            setDatos({ correo: "", contrasena: "" });
+            eventBus.emit('userLoggedIn'); 
             alert(`Bienvenido ${data.result.nombre}`);
-            navigate("/")
+            navigate("/");
         } catch (error) {
             console.log("Ha ocurrido un error: ", error);
             alert("Ha ocurrido favor de intentar nuevamente");

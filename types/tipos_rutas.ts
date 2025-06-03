@@ -27,7 +27,8 @@ export type controladores_productos = {
 
 export type controladores_carrito = {
     guardar: (c:Context)    => Promise<Response>,
-    actualizar: (c:Context) => Promise<Response>
+    actualizar: (c:Context) => Promise<Response>,
+    eliminar: (c:Context)   => Promise<Response>
 };
 
 export type controladores_favoritos = {

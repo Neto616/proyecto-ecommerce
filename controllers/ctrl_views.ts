@@ -157,7 +157,19 @@ const carrito = {
             return c.json(resultado)
         } catch (error) {
             console.error("Ha ocurrido un error favor de intentarlo nuevamente: ", error);
-            return c.json({ estatus: 0, info: { message: "Ha ocurrido un error al momento de quere obtener los datos del carrito"}})
+            return c.json({ estatus: 0, info: { message: "Ha ocurrido un error al momento de querer obtener los datos del carrito"}})
+        }
+    },
+    conteo: async (c:Context) => {
+        try {
+            const userId = JSON.parse(getCookie(c, "usuario_cookie") || JSON.stringify({ id: 2 }));
+            const carrito: Carrito = new Carrito(userId.id);
+            const resultado = await carrito.countProductCart();
+
+            return c.json(resultado);
+        } catch (error) {
+            console.error("Ha ocurrido un error favor de intentarlo nuevamente: ", error);
+            return c.json({ estatus: 0, info: { message: "Ha ocurrido un error al momento de quere obtener el conteo de productos del carrito" }});1
         }
     }
 }

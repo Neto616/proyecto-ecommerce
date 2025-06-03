@@ -9,7 +9,7 @@ import Loading from "../components/loader.jsx";
 function CatalogoProductos () {
     let location = useLocation();
     const navigate = useNavigate();
-    const [loader, setLoader] = useState(false);
+    const [loader, setLoader] = useState(true);
     const [productList, setProductList] = useState([]);
     const [paginacion, setPaginacion] = useState({});
 

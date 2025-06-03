@@ -23,14 +23,21 @@ route.get("/session", (c: Context): Response => {
 route.get("/", usuarios.inicio);
 
 //Estas rutas traen información en un JSON
-route.get("/productos", productos.todos); //Recolecta y envia los productos dependiendo de los filtros que este tenga en la ruta
-route.get("/destacados", productos.destacados); //Trae los productos destacados del sitio (Los primeros 4)
-route.get("/carrito", /*hasSession,*/ carrito.obtener);
-route.get("/favoritos", hasSession, favoritos.getFavs); 
 route.get("/categoria", categorias.getCategoria); //Trae una lista con todas las categorias que se tengan en base de datos
-route.get("/user_exist", usuarios.existe); //Ruta que avisa si el usuario existe o no para saber donde redirigirlo
+
+//Ruta para traer información de los productos
+route.get("/productos", productos.todos); //Recolecta y envia los productos dependiendo de los filtros que este tenga en la ruta
 route.get("/detalle/:producto", productos.detalle); //Ruta que nos traera el JSON con el detalle del producto
+route.get("/destacados", productos.destacados); //Trae los productos destacados del sitio (Los primeros 4)
+
+// Rutas para traer la información del usuario
+route.get("/mi_cuenta")
+route.get("/user_exist", usuarios.existe); //Ruta que avisa si el usuario existe o no para saber donde redirigirlo
 route.get("/productos-favoritos", productos.favoritos); //Ruta que nos traera el JSON con los productos marcados como favoritos por el usuario
+route.get("/favoritos", hasSession, favoritos.getFavs); //Obtiene los productos favoritos del usuario
+route.get("/carrito", hasSession, carrito.obtener); //Obtiene los productos que el usuario tenga guardado en su carrito
+route.get("/conteo_productos", hasSession, carrito.conteo);//Ruta para obtener la cantidad de productos que el usuario haya guardado en su carrito
+
 route.get("/cerrar-sesion", (c: Context): Response => {
     try {
         deleteCookie(c, "usuario_cookie");

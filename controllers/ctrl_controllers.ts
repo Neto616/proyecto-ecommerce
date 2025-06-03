@@ -4,7 +4,7 @@ import { Context } from "hono";
 import { getCookie, setCookie} from 'hono/cookie'
 //Importamos los modulos que generamos de nuestor proyecto
 import { controladores_carrito, controladores_usuario } from "../types/tipos_rutas.ts";
-import {Carrito, Categorias, Favoritos, Usuarios} from '../db/consultas.ts';
+import {Carrito, Categorias, Favoritos, Usuarios, Pedido} from '../db/consultas.ts';
 import { controladores_favoritos } from '../types/tipos_rutas.ts';
 
 //Generamos nuestra constante que sera un JSON del tipo asignado con las funciones necesarias para 
@@ -123,10 +123,11 @@ const favorites_abc: controladores_favoritos = {
 const carritos_abc: controladores_carrito = {
     guardar: async (c:Context) => {
         try {
-            const userId = JSON.parse(getCookie(c, "usuario_cookie") || "{}");
+            console.log("C papu")
             const {producto, cantidad} = await c.req.json()
-            const carrito: Carrito = new Carrito(userId);
-            const resultado = await carrito.addToCart(producto, cantidad);
+            const userId = JSON.parse(getCookie(c, "usuario_cookie") || JSON.stringify({ id: 2 }));
+            const carrito: Carrito = new Carrito(userId.id);
+            const resultado = await carrito.addToCart(producto, (cantidad ?? 1));
             return c.json( resultado );
         } catch (error) {
             console.log("[Ruta guardar carrito] Ha ocurrido un error: ", error);
@@ -138,6 +139,42 @@ const carritos_abc: controladores_carrito = {
     },
     actualizar: async (c:Context) => {
         return c.json({ estatus: 1 });
+    },
+    eliminar: async (c:Context) => {
+        try {
+            console.log("C papu");
+            const producto = parseInt(c.req.param("producto") ?? 0);
+            console.log("El id del producto es: ", producto)
+            const userId = JSON.parse(getCookie(c, "usuario_cookie") || JSON.stringify({ id: 2 }));
+            const carrito: Carrito = new Carrito( userId.id );
+            const resultado = await carrito.deleteCart( producto  );
+            return c.json( resultado );
+        } catch (error) {
+            console.log("[Ruta eliminar carrito] Ha ocurrido un problema: ", error);
+            return c.json({ estatus: 0, result: {
+                info: "Ha ocurrido un error",
+                data: []
+            }});
+        }
+    }
+}
+
+const pedidos_abc = {
+    finalizar: async (c:Context) => {
+        try {
+            const userId = JSON.parse(getCookie(c, "usuario_cookie") || JSON.stringify({}));
+            const pedido: Pedido = new Pedido( userId.id );
+            const resultado = await pedido.cerrarPedido();
+
+            return c.json( resultado );
+        } catch (error) {
+            console.error("Ha ocurrido un error: ", error);
+            return c.json({
+                estatus: 0, result: {
+                    info: "Ha ocurrido un error"
+                }
+            })
+        }
     }
 }
 
@@ -159,5 +196,6 @@ export {
     usuarios_abc, 
     favorites_abc,
     carritos_abc,
+    pedidos_abc,
     categorias
 }

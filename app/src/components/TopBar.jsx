@@ -1,35 +1,77 @@
 // src/components/TopBar.jsx
 import React, { useEffect, useState } from "react";
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, UNSAFE_getTurboStreamSingleFetchDataStrategy, useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import "./Topbar.css";
+import eventBus from "../utils/eventBus.js";
 
 function TopBar({ onBurgerClick }){
     const navigate = useNavigate();
+    const [conteo, setConteo] = useState(0);
     const [busqueda, setBusqueda] = useState("");
-    const [resultados, setResultados] = useState({})
+    const [resultados, setResultados] = useState({});
     
     const getResults = async () => {
         try {
             console.log("Busqueda desde el getResults: ",busqueda)
             const resultado = await fetch(`http://localhost:3001/api/productos?b=${busqueda}`, {method: "GET"});
             const data = await resultado.json();
-
             console.log(data)
             setResultados(data.result.data);
+            return;
         } catch (error) {
             console.log("Ha sucedido un error en el buscador: ", error)
         }
     }
 
-    useEffect(()=>{
+    const getCountProducts = async () => {
+        try {
+            console.log("Conteo de los productos");
+            const resultado = await fetch("http://localhost:3001/api/conteo_productos", { method: "GET" });
+            const data = await resultado.json();
+            setConteo(data.info?.data || 0);
+        } catch (error) {
+            console.error("Ha ocurrido un error: ", error);
+            return;
+        }
+    }
 
+    useEffect(() => {
+        // 1. Carga inicial del conteo (cuando el componente se monta)
+        getCountProducts();
+
+        // 2. Suscribirse al evento 'cartUpdated' (cuando un producto se añade/elimina)
+        const handleCartUpdate = () => {
+            console.log("Evento 'cartUpdated' recibido en TopBar. Actualizando conteo...");
+            getCountProducts(); // Volver a pedir el conteo actualizado
+        };
+
+        eventBus.on('cartUpdated', handleCartUpdate);
+        eventBus.on('userLoggedIn', handleCartUpdate);
+
+        // 3. ¡NUEVA SUSCRIPCIÓN! Escuchar el evento 'userLoggedOut'
+        const handleUserLoggedOut = () => {
+            console.log("Evento 'userLoggedOut' recibido. Restableciendo conteo a 0.");
+            setConteo(0); // Restablece el conteo a cero directamente
+        };
+        eventBus.on('userLoggedOut', handleUserLoggedOut); // <--- NUEVA SUSCRIPCIÓN
+
+        // 4. Función de limpieza para desuscribirse de ambos eventos
+        return () => {
+            eventBus.off('cartUpdated', handleCartUpdate);
+            eventBus.off('userLoggedIn', handleCartUpdate);
+            eventBus.off('userLoggedOut', handleUserLoggedOut); 
+        };
+    }, []);
+
+    useEffect(()=>{    
         if(busqueda.length <= 3) return;
         else {
             getResults();
             console.log("La busqueda trae estos datos: "+resultados)
         }
-    }, [busqueda])
+    }, [busqueda]);
+
     return(
         <header className="top-bar">
             <div className="top-bar-left">
@@ -69,7 +111,7 @@ function TopBar({ onBurgerClick }){
             <div className="top-bar-right">
                 <Link to="/carrito" className="icon-link" aria-label="Carrito de Compras">
                     <FontAwesomeIcon icon="fa-solid fa-shopping-cart" />
-                    <span className="cart-count">0</span>
+                    <span className="cart-count">{conteo ?? "0"}</span>
                 </Link>
                 <Link to="/favoritos" className="icon-link" aria-label="Favoritos">
                     <FontAwesomeIcon icon="fa-solid fa-heart" />

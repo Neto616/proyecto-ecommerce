@@ -26,6 +26,22 @@ function DetalleProductos () {
       }
     }
 
+    const addToCart = async (idProducto) => {
+      try {
+        const peticion = await fetch("http://localhost:3001/api/carrito", {method: "POST", body: JSON.stringify({ producto: idProducto, cantidad: quantity })});
+        const data = await peticion.json();
+        console.log(data)
+        if(data.estatus === -2) {
+                alert("Debes tener una cuenta para poder guardar productos al carrito")
+                navigate("/");
+        }else if(data.estatus === 0) alert("Ha ocurrido un error favor de intentarlo de nuevo");
+        else alert("Se ha guardado el articulo en su carrito");
+      } catch (error) {
+        console.log("[Agregar producto detalle] Ha ocurrido un error: ", error);
+        alert("Ha ocurrido algo favor de intentarlo nuevamente");
+      }
+    }
+
     useEffect(()=>{
       window.scrollTo(0,0);
       getData(location.pathname);
@@ -62,8 +78,8 @@ function DetalleProductos () {
                   </div>
                 </div>
 
-                <button className="boton-comprar">
-                  {/* <FontAwesomeIcon icon="fa-shopping-cart" /> */} Comprar ahora
+                <button className="boton-comprar" onClick={(e) => addToCart(datos.id)}>
+                  <FontAwesomeIcon icon="fa-shopping-cart" />  Comprar ahora
                 </button>
               </div>
             </div>

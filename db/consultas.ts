@@ -1,4 +1,5 @@
 //Importamos nuestra clase abstracta para la conexión a nuestra base de datos
+import { _format } from "https://deno.land/std@0.104.0/testing/asserts.ts";
 import Consultas from "./connection.ts";
 
 //Creamos nuestra clase Usuarios que va a heredar de Consultas esto nos permitira acceder a la función para conectar la bd
@@ -314,13 +315,42 @@ class Productos extends Consultas{
 //Creamos una clase Carrito que hereda Consultas
 class Carrito extends Consultas {
     //Creamos nuestro constructor con un atributo privado usuarioId para poder ingresar al carrito de nuestro usuario.
-    constructor(private usuarioId: number = 2){
+    constructor(private usuarioId: number){
         super();
     }
     //Creamos un getter para obtener nuestro atributo privado (No es necesario pero se deja)
     //retornara un valor numerico
     public getUsuarioId(): number {
         return this.usuarioId;
+    }
+    //Metodoo que regresará la cantidad de productos que el usuario tenga en su carrito
+    public async countProductCart() {
+        try {
+            //Verificamos la conexion en caso de no tener la conexion a la base de datos en caso de no tener conexion 
+            //realizara el metodo para conectar la base de datos
+            if(!this.db) await this.initDB();
+
+            const { rows } = await this.db.execute(`
+                select 
+                    count(pp.id_pedido) as numero_productos
+                from pedidos p
+                inner join pedidos_partidas pp on pp.id_pedido = p.id
+                inner join productos prod on prod.id = pp.id_producto
+                where p.id_usuario = ? and p.fecha_cierre_pedido is null
+                group by pp.id_pedido;
+                `, [this.getUsuarioId()]);
+
+            return {
+                estatus: 1,
+                info: {
+                    message: "Listado de todos los productos dentro del carrito: ",
+                    data: rows[0]?.numero_productos || 0
+                }
+            };
+        } catch (error) {
+            console.error("Ha ocurrido un error contando los productos: ", error)
+            throw error;
+        }
     }
     //Metodo asincrono para obtener tods los productos que el usuario tenga en el carrito
     public async carrito(){
@@ -336,6 +366,7 @@ class Carrito extends Consultas {
                     prod.sku,
                     format(p.precio_total, 2) as total_pagar,
                     pp.producto,
+                    prod.id as id_producto,
                     prod.imagen,
                     pp.cantidad,
                     format(pp.precio, 2) as precio_formateado,
@@ -346,7 +377,6 @@ class Carrito extends Consultas {
                 inner join pedidos_partidas pp on pp.id_pedido = p.id
                 inner join productos prod on prod.id = pp.id_producto
                 where p.id_usuario = ? and p.fecha_cierre_pedido is null`, [this.getUsuarioId()]);
-            //Retornamos un JSON con estado 1 y con los datos listados de los objetos
             console.log(`Usuario: ${this.getUsuarioId()}\nRESULTADO: ${rows}`)
             return {
                 estatus: 1,
@@ -378,13 +408,14 @@ class Carrito extends Consultas {
             const productoConsulta: Productos = new Productos(producto);
             //Obtenemos el numero de existencia que tiene el producto
             const hasExistence: number = await productoConsulta.hasExistence();
+            console.log()
             //En caso de que hasExistence sea cero retornamos un estado en 2 dando a entender que el producto ya no tiene existencia
             if(!hasExistence) return {estatus: 2, result: {message: "El producto no tiene existencia"}};
             //Si la existencia que tiene el producto es menor a la cantidad que quieren obtener se avisara de eso
             if(hasExistence < cantidad) return {estatus: 3, result: {message: "La cantidad es mayor a la existencia que se tiene"}};
             //Se ejecuta el procedimiento almacenado para guardar los productos en el carrito o crear el pedido y almacenando el carrit
-            await this.db.execute(
-                `call guardar_carrito(?,?,?, @estatus, @mensaje)`,
+            // console.log(this.getUsuarioId())
+            await this.db.execute(`call guardar_carrito(?,?,?, @estatus, @mensaje)`,
                 [this.getUsuarioId(), producto, cantidad]
             )
             //Una vez se ejecuta el procedimiento anterior obtenemos las variables de salida
@@ -475,6 +506,38 @@ class Carrito extends Consultas {
                     message: "Ha ocurrido un error: "+error
                 }
             };
+        }
+    }
+}
+//Clase para realizar acciones que tenga que ver con los pedidos
+class Pedido extends Consultas {
+    constructor(public usuarioId: number){super()}
+
+    //Getters
+    public getUsuarioId():number {
+        //Obtenemos la propiedad y la retornamos
+        return this.usuarioId;
+    }
+
+    public async cerrarPedido(){
+        try {
+            if(!this.db) await this.initDB();
+            
+            await this.db.execute(`call finalizar_pedido (?, @estatus, @mensaje);`, [this.getUsuarioId()]);
+
+            const [output] = await this.db.query(`select @estatus as estatus, @mensaje as mensaje;`);
+            
+            if(output.estatus == 0) return { estatus: 0, info: { message: "NO se ha logrado encontrar el pedido"}};
+
+            return {
+                estatus: 1,
+                info: {
+                    message: "Se ha finalizado el pedido UwU"
+                }
+            }
+        } catch (error) {
+            console.error("Ha ocurrido un error al cerrar pedido: ", error);
+            throw error;
         }
     }
 }
@@ -743,6 +806,7 @@ export {
     Usuarios, 
     Productos,
     Carrito,
+    Pedido,
     Favoritos,
     Categorias,
 };
