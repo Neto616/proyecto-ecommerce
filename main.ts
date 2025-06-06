@@ -1,3 +1,4 @@
+//
 import { Hono, Context } from 'https://deno.land/x/hono@v4.1.6/mod.ts';
 import { cors } from "https://deno.land/x/hono@v4.1.6/middleware.ts"
 // Importamos las rutas
@@ -8,10 +9,12 @@ const app = new Hono();
 
 app.use(cors());
 
-// Definimos las rutas
+// Definimos las rutas tantos para las vistas como los controladores
 app.route('/api/', vista);
 app.route('/api/', controllers);
+//Creamos un middlware para qu cargun las imagens para acceder a ella debe tener /images y el nombr de las carpetas que este tenga
 app.use("/images/*", serveStatic({ root: "./images", rewriteRequestPath: (path) => path.replace("/images", "") }));
+//Creamos un middleware para que renderice el html sin importar la ruta
 app.use(
   '*', // Aplica este middleware a todas las rutas
   serveStatic({
@@ -24,7 +27,6 @@ app.use(
     },
   })
 );
-
 // Ruta para recursos no encontrados
 app.get('/*', (c: Context): Response => {
   return c.json({

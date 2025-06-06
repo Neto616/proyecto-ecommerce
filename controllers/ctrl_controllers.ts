@@ -6,7 +6,6 @@ import { getCookie, setCookie} from 'hono/cookie'
 import { controladores_carrito, controladores_usuario } from "../types/tipos_rutas.ts";
 import { Carrito, Categorias, Favoritos, Usuarios, Pedido, MiCuenta } from '../db/consultas.ts';
 import { controladores_favoritos } from '../types/tipos_rutas.ts';
-import { use } from "hono/jsx";
 
 //Generamos nuestra constante que sera un JSON del tipo asignado con las funciones necesarias para 
 //ser llamadas en la ruta correspondiente
@@ -97,16 +96,22 @@ const usuarios_abc: controladores_usuario = {
         }
     }
 }
-
+// Función para obtener lo necesario para la información de "mi cuenta"
 const miCuenta = {
+    //Funcion que obtiene los datos del usuario
     userInfo: async (c:Context) => {
+        //Encapsulamos la función en un try catch para tener control sobre posibles errores
         try {
-            const userId = JSON.parse(getCookie(c, "usuario_cookie") || JSON.stringify({ id: 2 }));
+            //Obtenemos la sesión de nuestor usuario
+            const userId = JSON.parse(getCookie(c, "usuario_cookie") || JSON.stringify({}));
+            // Inicializamos nuestro objeto y le pasamos el id de la sesión
             const userInfo: MiCuenta = new MiCuenta(userId.id);
+            //Llamamos el metodo para obtener la información del usuario
             const resultado = await userInfo.getInfo();
-
+            // Retornamos el resultado que nos da el metodo 
             return c.json( resultado );
         } catch (error) {
+            //En caso de algun error imprimimos nuestro error en consola y retornamos nuestro estatus cero para dar a enteder que ocurrio un error
             console.error("Ha ocurrido un error: ", error);
             return c.json({ estatus: 0, result: {
                 info: "Ha ocurrido un error",
@@ -139,15 +144,22 @@ const favorites_abc: controladores_favoritos = {
 }
 
 const carritos_abc: controladores_carrito = {
+    //Función para guardar productos al carrito donde le pasamos el contexto que tenga actualmente
     guardar: async (c:Context) => {
+        //Encapsulamos la función en un try catch para tener control de los errores que puedan suceder
         try {
-            console.log("C papu")
+            //Obtenemos los datos del cuerpo de la peticion
             const {producto, cantidad} = await c.req.json()
-            const userId = JSON.parse(getCookie(c, "usuario_cookie") || JSON.stringify({ id: 2 }));
+            //Obtenemos el id que almacena la cookie osea la sesión de nuestro usuario
+            const userId = JSON.parse(getCookie(c, "usuario_cookie") || JSON.stringify({}));
+            //Inicializamos nuestro objeto Carrito y en el parametro le pasamos el identificador del usuario
             const carrito: Carrito = new Carrito(userId.id);
+            //Ejecutamos el metodo para añadir dicho producot al carrito
             const resultado = await carrito.addToCart(producto, (cantidad ?? 1));
+            //Retornamos el resultado que nos da el metodo 
             return c.json( resultado );
         } catch (error) {
+            //En caos de algun error imprimimos en consola el error y retornamos un estatus en cero 
             console.log("[Ruta guardar carrito] Ha ocurrido un error: ", error);
             return c.json({ estatus: 0, result: {
                 info: "Ha ocurrido un error",
@@ -155,19 +167,22 @@ const carritos_abc: controladores_carrito = {
             }});
         }
     },
-    actualizar: async (c:Context) => {
-        return c.json({ estatus: 1 });
-    },
+    //Funcion encargada de eliminar un producto del carrito
     eliminar: async (c:Context) => {
+        //Encapsulamos la función en un try catch para tener control de los errores que puedan suceder
         try {
-            console.log("C papu");
+            //Obtenemos el id del producto que no llega dentor de los paramestros del end point
             const producto = parseInt(c.req.param("producto") ?? 0);
-            console.log("El id del producto es: ", producto)
-            const userId = JSON.parse(getCookie(c, "usuario_cookie") || JSON.stringify({ id: 2 }));
+            //Obtenemos el identificador del usuario
+            const userId = JSON.parse(getCookie(c, "usuario_cookie") || JSON.stringify({}));
+            //Inicializamos el objeto Carrito
             const carrito: Carrito = new Carrito( userId.id );
-            const resultado = await carrito.deleteCart( producto  );
+            //Ejecutamos el metodo encargado de borrar un producto del carrito
+            const resultado = await carrito.deleteCart( producto );
+            //Retornamos nuestra respuesta del metodo
             return c.json( resultado );
         } catch (error) {
+            //En caso de algun error lo imprimmos en consola y reotrnamos un estatus de cero
             console.log("[Ruta eliminar carrito] Ha ocurrido un problema: ", error);
             return c.json({ estatus: 0, result: {
                 info: "Ha ocurrido un error",
@@ -179,13 +194,18 @@ const carritos_abc: controladores_carrito = {
 
 const pedidos_abc = {
     finalizar: async (c:Context) => {
+        //Encapsulamos la función en un try catch para tener control de los errores que puedan suceder
         try {
+            //Obtenemos el ID de la sesión de nuestro usuario
             const userId = JSON.parse(getCookie(c, "usuario_cookie") || JSON.stringify({}));
+            //Inicializamos nuestor objeto Pedido y le pasamos el id del usuario a su parametro
             const pedido: Pedido = new Pedido( userId.id );
+            //Ejecutamos nuestro metodo que se encarga de cerrar los pedidos
             const resultado = await pedido.cerrarPedido();
-
+            //Retornamos un json con el resultado que retorna cerrar pedido
             return c.json( resultado );
         } catch (error) {
+            // En caso de algun error lo mostramos en consola y retornamos un estatus de cero
             console.error("Ha ocurrido un error: ", error);
             return c.json({
                 estatus: 0, result: {
@@ -195,12 +215,18 @@ const pedidos_abc = {
         }
     },
     pedidosUsuarios: async (c:Context) => {
+        //Encapsulamos la función en un try catch para tener control de los errores que puedan suceder
         try {
-            const userId = JSON.parse(getCookie(c, "usuario_cookie") || JSON.stringify({ id: 2 }));
+            //obtenemos el identificador de la sesión del usuario
+            const userId = JSON.parse(getCookie(c, "usuario_cookie") || JSON.stringify({}));
+            //Inicializamos nuestro objeto Pedido que le pasamos el identificador del usuario
             const pedido: Pedido = new Pedido(userId.id);
+            //Obtenemos los primeros 12 pedidos
             const resultado = await pedido.getOrders(1, 12);
+            //Retornamos el valor que nos da el resultado anterior
             return c.json(resultado);
         } catch (error) {
+            //En caso de algun error imprimimos en consola el error y retornamos un estatus de cero para dar a entender que hay un error
             console.error("Ha ocurrido un error: ", error);
             return c.json({
                 estatus: 0, result: {
@@ -214,18 +240,22 @@ const pedidos_abc = {
 
 const categorias = {
     getCategoria: async (c: Context) => {
+        //Encapsulamos la función en un try catch para tener control de los errores que puedan suceder
         try {
+            //Inicializamos el objeto de categorias
             const categoria: Categorias = new Categorias();
+            //Llamamos el metodo para obtener las categorias de base de datos
             const resultado = await categoria.getCategorias();
-            // console.log("Categorias: ", resultado)
+            //Retornamos el resultado para que en el front lo procesen
             return c.json(resultado);
         } catch (error) {
+            //En caso de error imprimimos el error y retornamos un estatus de cero
             console.error(error);
             return c.json({ estatus: 0, result: {info: "Hubo un error", error: error}});
         }
     }
 }
-
+//Exportamos todos los json que tienen las funciones necesarias para poder
 export { 
     usuarios_abc, 
     miCuenta,

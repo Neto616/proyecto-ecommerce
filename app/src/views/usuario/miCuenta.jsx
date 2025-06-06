@@ -67,7 +67,6 @@ function MiCuenta () {
     useEffect(()=>{
       if(section === "profile") getUserData();
       if(section === "orders") getOrders();
-      else console.log("c papu")
     }, [section])
 
     return (

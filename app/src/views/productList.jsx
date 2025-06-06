@@ -7,7 +7,7 @@ import Paginacion from "../components/paginacion.jsx";
 import Loading from "../components/loader.jsx";
 
 function CatalogoProductos () {
-    let location = useLocation();
+    // let location = useLocation();
     const navigate = useNavigate();
     const [loader, setLoader] = useState(true);
     const [productList, setProductList] = useState([]);
@@ -49,7 +49,7 @@ function CatalogoProductos () {
       splitted.shift()
       
       for (let i = 0; i < splitted.length; i += 2) {
-        let number = i;
+        // let number = i;
         console.log(splitted[i]+"= "+splitted[i+1])
         jsonRequest[splitted[i]] = splitted[i+1];
       }
@@ -99,7 +99,7 @@ function CatalogoProductos () {
           <section className="product-grid-section">
             <div className="product-grid">
               {productList.length ? (
-                productList.map((e, i) => <ProductCard key = {i} productId = {e.id} nombre = {e.nombre} precio = {e.precio_format} sku = {e.sku} imgName = {e.imagen} isFav={""}/>)
+                productList.map((e, i) => <ProductCard key = {i} productId = {e.id} nombre = {e.nombre} precio = {e.precio_format} sku = {e.sku} imgName = {e.imagen} isFav={false}/>)
               ): (<h1>Aun no hay productos pero lo invitamos a que siga con nosotros  proximamente habrá mas productos 😊</h1>)}
             </div>
             {/* <p>No se encontraron productos con los filtros seleccionados.</p>  // Esto se mostraría condicionalmente con estado */}

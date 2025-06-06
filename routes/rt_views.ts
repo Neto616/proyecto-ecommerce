@@ -31,17 +31,21 @@ route.get("/detalle/:producto", productos.detalle); //Ruta que nos traera el JSO
 route.get("/destacados", productos.destacados); //Trae los productos destacados del sitio (Los primeros 4)
 
 // Rutas para traer la información del usuario
-route.get("/user_info", hasSession, miCuenta.userInfo); // Ruta para obtener los datos de un usuario.
+route.get("/user_info", hasSession, miCuenta.userInfo); // Ruta para obtener los datos de un usuario este hace uso de un Middleware.
+// Este mdw verifica si el usuario tiene iniciada su cuenta o no
 route.get("/user_orders", hasSession, pedidos_abc.pedidosUsuarios); // Ruta para obtener los datos de un usuario.
+// Este mdw verifica si el usuario tiene iniciada su cuenta o no
 route.get("/user_exist", usuarios.existe); //Ruta que avisa si el usuario existe o no para saber donde redirigirlo
 route.get("/productos-favoritos", productos.favoritos); //Ruta que nos traera el JSON con los productos marcados como favoritos por el usuario
 route.get("/favoritos", hasSession, favoritos.getFavs); //Obtiene los productos favoritos del usuario
+// Este mdw verifica si el usuario tiene iniciada su cuenta o no
 route.get("/carrito", hasSession, carrito.obtener); //Obtiene los productos que el usuario tenga guardado en su carrito
+// Este mdw verifica si el usuario tiene iniciada su cuenta o no
 route.get("/conteo_productos", hasSession, carrito.conteo);//Ruta para obtener la cantidad de productos que el usuario haya guardado en su carrito
-
+// Este mdw verifica si el usuario tiene iniciada su cuenta o no
+//Ruta encargada de cerrar la sesión activa del usuario
 route.get("/cerrar-sesion", (c: Context): Response => {
     try {
-        console.log("C papus")
         deleteCookie(c, "usuario_cookie");
         return c.redirect("/");
     } catch (error) {
